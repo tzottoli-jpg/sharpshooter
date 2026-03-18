@@ -115,7 +115,7 @@ function saveElimToLS(d) { try { localStorage.setItem(LS_ELIM_KEY,JSON.stringify
 async function fetchESPNScores() {
   try {
     const boardRes = await fetch(
-      "https://YOUR-WORKER.workers.dev/scoreboard?groups=50&limit=100",
+      "https://https://sharpshooter-proxy.tzottoli.workers.dev//scoreboard?groups=50&limit=100",
       { signal: AbortSignal.timeout(8000) }
     );
     if (!boardRes.ok) throw new Error("scoreboard fetch failed");
@@ -129,7 +129,7 @@ async function fetchESPNScores() {
     await Promise.all(events.map(async ev=>{
       const isLive=ev.status?.type?.name==="STATUS_IN_PROGRESS";
       try {
-        const r=await fetch(`https://YOUR-WORKER.workers.dev/summary?event=${ev.id}`,{signal:AbortSignal.timeout(8000)});
+        const r=await fetch(`https://https://sharpshooter-proxy.tzottoli.workers.dev//summary?event=${ev.id}`,{signal:AbortSignal.timeout(8000)});
         if(!r.ok) return;
         const s=await r.json();
         for(const td of s?.boxscore?.players||[]){
