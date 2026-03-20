@@ -126,7 +126,7 @@ function saveElimToLS(d) { try { localStorage.setItem(LS_ELIM_KEY,JSON.stringify
 // Reads directly from the scoreboard leaders array — no per-game summary calls.
 // The scoreboard response already contains points leaders per game per team,
 // which is enough to score all our drafted players accurately.
-const PROXY = "https://YOUR-WORKER.workers.dev";
+const PROXY = "https://sharpshooter-proxy.tzottoli.workers.dev";
 
 async function fetchESPNScores() {
   try {
