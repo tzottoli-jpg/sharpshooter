@@ -5,9 +5,9 @@ import { useState, useEffect, useCallback, useRef, useMemo } from "react";
 const ROSTERS = {
   Trent: [
     { name: "Brayden Burries",      school: "Arizona",    espnId: "5082206",  teamId: "12",   projected: 88,  seed: 4,  region: "West"    },
-    { name: "Dominique Daniels Jr", school: "Cal Baptist",espnId: null,       teamId: "2072", projected: 23,  seed: 14, region: "South"   },
+    { name: "Dominique Daniels Jr", school: "Cal Baptist",espnId: "5178207",  teamId: "2072", projected: 23,  seed: 14, region: "South"   },
     { name: "Darius Acuff Jr",      school: "Arkansas",   espnId: "5142620",  teamId: "8",    projected: 68,  seed: 5,  region: "South"   },
-    { name: "Larry Johnson",        school: "McNeese",    espnId: null,       teamId: "2377", projected: 26,  seed: 13, region: "Midwest" },
+    { name: "Larry Johnson",        school: "McNeese",    espnId: "5144375",  teamId: "2377", projected: 26,  seed: 13, region: "Midwest" },
     { name: "Joshua Jefferson",     school: "Iowa State", espnId: "4870564",  teamId: "66",   projected: 76,  seed: 2,  region: "South"   },
     { name: "Ja'Kobi Gillespie",    school: "Tennessee",  espnId: "5107968",  teamId: "2633", projected: 45,  seed: 2,  region: "East"    },
     { name: "Emmanuel Sharp",       school: "Houston",    espnId: "5106058",  teamId: "248",  projected: 69,  seed: 3,  region: "Midwest" },
@@ -16,7 +16,7 @@ const ROSTERS = {
   JB: [
     { name: "Cam Boozer",           school: "Duke",       espnId: "5041935",  teamId: "150",  projected: 125, seed: 1,  region: "East"    },
     { name: "Damari Wheeler",       school: "NDSU",       espnId: "5107273",  teamId: "2449", projected: 14,  seed: 16, region: "East"    },
-    { name: "Keaton Wagner",        school: "Illinois",   espnId: null,       teamId: "356",  projected: 63,  seed: 6,  region: "West"    },
+    { name: "Keaton Wagler",        school: "Illinois",   espnId: "5254165",  teamId: "356",  projected: 63,  seed: 6,  region: "West"    },
     { name: "John Mobley Jr",       school: "Ohio State", espnId: "5060708",  teamId: "194",  projected: 20,  seed: 11, region: "South"   },
     { name: "Jaden Bradley",        school: "Arizona",    espnId: "4432737",  teamId: "12",   projected: 74,  seed: 4,  region: "West"    },
     { name: "Ryan Conwell",         school: "Louisville", espnId: "5107157",  teamId: "97",   projected: 47,  seed: 7,  region: "West"    },
@@ -25,27 +25,27 @@ const ROSTERS = {
   ],
   Kelly: [
     { name: "Thomas Haugh",         school: "Florida",    espnId: "5080489",  teamId: "57",   projected: 94,  seed: 1,  region: "South"   },
-    { name: "Cruz Davis",           school: "Hofstra",    espnId: null,       teamId: "2293", projected: 20,  seed: 15, region: "East"    },
+    { name: "Cruz Davis",           school: "Hofstra",    espnId: "5107198",  teamId: "2293", projected: 20,  seed: 15, region: "East"    },
     { name: "AJ Dybantsa",          school: "BYU",        espnId: "5142718",  teamId: "252",  projected: 63,  seed: 6,  region: "Midwest" },
     { name: "Jeremiah Wilkinson",   school: "Georgia",    espnId: "5165276",  teamId: "61",   projected: 26,  seed: 8,  region: "South"   },
     { name: "Graham Ike",           school: "Gonzaga",    espnId: "4703396",  teamId: "2250", projected: 69,  seed: 5,  region: "West"    },
-    { name: "Tyler Bilodeau",       school: "UCLA",       espnId: null,       teamId: "26",   projected: 28,  seed: 9,  region: "Midwest" },
+    { name: "Tyler Bilodeau",       school: "UCLA",       espnId: "5105626",  teamId: "26",   projected: 28,  seed: 9,  region: "Midwest" },
     { name: "Meleek Thomas",        school: "Arkansas",   espnId: "5041951",  teamId: "8",    projected: 43,  seed: 5,  region: "South"   },
     { name: "Pryce Sandfort",       school: "Nebraska",   espnId: "4858604",  teamId: "158",  projected: 25,  seed: 10, region: "West"    },
   ],
   Pat: [
     { name: "Yaxel Lendeborg",      school: "Michigan",   espnId: "5175737",  teamId: "130",  projected: 79,  seed: 1,  region: "Midwest" },
-    { name: "Preston Edmead",       school: "Hofstra",    espnId: null,       teamId: "2293", projected: 10,  seed: 15, region: "East"    },
+    { name: "Preston Edmead",       school: "Hofstra",    espnId: "5236222",  teamId: "2293", projected: 10,  seed: 15, region: "East"    },
     { name: "Koa Peat",             school: "Arizona",    espnId: "5041953",  teamId: "12",   projected: 75,  seed: 4,  region: "West"    },
     { name: "Bruce Thornton",       school: "Ohio State", espnId: "5105837",  teamId: "194",  projected: 30,  seed: 11, region: "South"   },
     { name: "Andrej Stojakovic",    school: "Illinois",   espnId: "5175007",  teamId: "356",  projected: 47,  seed: 6,  region: "West"    },
-    { name: "Nate Ament",           school: "Tennessee",  espnId: "5164559",       teamId: "2633", projected: 44,  seed: 2,  region: "East"    },
+    { name: "Nate Ament",           school: "Tennessee",  espnId: "5164559",  teamId: "2633", projected: 44,  seed: 2,  region: "East"    },
     { name: "Alex Karaban",         school: "UConn",      espnId: "4917149",  teamId: "41",   projected: 54,  seed: 3,  region: "West"    },
     { name: "Labaron Philon Jr",    school: "Alabama",    espnId: "4873090",  teamId: "333",  projected: 65,  seed: 1,  region: "South"   },
   ],
   Ben: [
     { name: "Kingston Flemings",    school: "Houston",    espnId: "5149077",  teamId: "248",  projected: 74,  seed: 3,  region: "Midwest" },
-    { name: "TJ Power",             school: "Penn",       espnId: null,       teamId: "219",  projected: 17,  seed: 14, region: "Midwest" },
+    { name: "TJ Power",             school: "Penn",       espnId: "4684843",  teamId: "219",  projected: 17,  seed: 14, region: "Midwest" },
     { name: "Isaiah Evans",         school: "Duke",       espnId: "5061585",  teamId: "150",  projected: 51,  seed: 1,  region: "East"    },
     { name: "Bennett Stirtz",       school: "Iowa",       espnId: "5241364",  teamId: "2294", projected: 30,  seed: 12, region: "Midwest" },
     { name: "Jeremy Fears",         school: "MSU",        espnId: "4711255",  teamId: "127",  projected: 55,  seed: 2,  region: "West"    },
@@ -113,22 +113,31 @@ for (const [manager, players] of Object.entries(ROSTERS)) {
 }
 
 // ─── LOCALSTORAGE ─────────────────────────────────────────────────────────────
-const LS_KEY     = "mm2026_scores_v5";
+const LS_KEY     = "mm2026_scores_v6";
 const STALE_KEYS = [
-  "mm2026_scores","mm2026_scores_v2","mm2026_scores_v3","mm2026_scores_v4",
+  "mm2026_scores","mm2026_scores_v2","mm2026_scores_v3","mm2026_scores_v4","mm2026_scores_v5",
   "mm2026_eliminated","mm2026_eliminated_v2","mm2026_eliminated_v3","mm2026_eliminated_v4"
 ];
 
-// Thursday R1 confirmed scores from the league spreadsheet.
-// These seed the cache so Round 1 points are never lost even if ESPN drops them.
-// Zero means the player had no points (eliminated early, didn't play, or null ID).
-const THURSDAY_SEED = {
+// Confirmed R1 scores manually seeded so points survive ESPN scoreboard expiry.
+// R1_THU = Thursday March 19, R1_FRI = Friday March 20.
+// Zero = player didn't score / didn't play that day.
+const R1_THU = {
   Trent: { "Brayden Burries": 0, "Dominique Daniels Jr": 0, "Darius Acuff Jr": 24, "Larry Johnson": 15, "Joshua Jefferson": 0, "Ja'Kobi Gillespie": 0, "Emmanuel Sharp": 16, "Tyler Tanner": 26 },
-  JB:    { "Cam Boozer": 22, "Damari Wheeler": 16, "Keaton Wagner": 18, "John Mobley Jr": 15, "Jaden Bradley": 0, "Ryan Conwell": 18, "Elliot Cadeau": 5, "Mirkovic": 29 },
+  JB:    { "Cam Boozer": 22, "Damari Wheeler": 16, "Keaton Wagler": 18, "John Mobley Jr": 15, "Jaden Bradley": 0, "Ryan Conwell": 18, "Elliot Cadeau": 5, "Mirkovic": 29 },
   Kelly: { "Thomas Haugh": 0, "Cruz Davis": 0, "AJ Dybantsa": 35, "Jeremiah Wilkinson": 30, "Graham Ike": 19, "Tyler Bilodeau": 0, "Meleek Thomas": 21, "Pryce Sandfort": 23 },
   Pat:   { "Yaxel Lendeborg": 9, "Preston Edmead": 0, "Koa Peat": 0, "Bruce Thornton": 10, "Andrej Stojakovic": 9, "Nate Ament": 0, "Alex Karaban": 0, "Labaron Philon Jr": 0 },
   Ben:   { "Kingston Flemings": 18, "TJ Power": 6, "Isaiah Evans": 16, "Bennett Stirtz": 0, "Jeremy Fears": 7, "Malik Reneau": 0, "Fletcher Loyer": 0, "Nick Boyd": 27 },
   Berit: { "Alex Condon": 0, "Thomas Dowd": 4, "Milan Momcilovic": 0, "Mark Mitchell": 0, "Morez Johnson Jr": 21, "Dailyn Swain": 14, "Tarris Reed": 0, "Daryn Peterson": 0 },
+};
+
+const R1_FRI = {
+  Trent: { "Brayden Burries": 18, "Dominique Daniels Jr": 25, "Darius Acuff Jr": 0, "Larry Johnson": 0, "Joshua Jefferson": 2, "Ja'Kobi Gillespie": 29, "Emmanuel Sharp": 0, "Tyler Tanner": 0 },
+  JB:    { "Cam Boozer": 0, "Damari Wheeler": 0, "Keaton Wagler": 0, "John Mobley Jr": 0, "Jaden Bradley": 7, "Ryan Conwell": 0, "Elliot Cadeau": 0, "Mirkovic": 0 },
+  Kelly: { "Thomas Haugh": 14, "Cruz Davis": 0, "AJ Dybantsa": 0, "Jeremiah Wilkinson": 0, "Graham Ike": 0, "Tyler Bilodeau": 0, "Meleek Thomas": 0, "Pryce Sandfort": 0 },
+  Pat:   { "Yaxel Lendeborg": 0, "Preston Edmead": 24, "Koa Peat": 15, "Bruce Thornton": 0, "Andrej Stojakovic": 0, "Nate Ament": 0, "Alex Karaban": 22, "Labaron Philon Jr": 29 },
+  Ben:   { "Kingston Flemings": 0, "TJ Power": 0, "Isaiah Evans": 0, "Bennett Stirtz": 16, "Jeremy Fears": 0, "Malik Reneau": 24, "Fletcher Loyer": 14, "Nick Boyd": 0 },
+  Berit: { "Alex Condon": 13, "Thomas Dowd": 0, "Milan Momcilovic": 17, "Mark Mitchell": 19, "Morez Johnson Jr": 0, "Dailyn Swain": 0, "Tarris Reed": 31, "Daryn Peterson": 28 },
 };
 
 function buildSeedScores() {
@@ -136,8 +145,15 @@ function buildSeedScores() {
   for (const [m, ps] of Object.entries(ROSTERS)) {
     s[m] = {};
     for (const p of ps) {
-      const seedPts = THURSDAY_SEED[m]?.[p.name] ?? 0;
-      s[m][p.name] = { pts: seedPts, lastGame: seedPts, live: false, rounds: seedPts > 0 ? [seedPts] : [] };
+      const r1 = R1_THU[m]?.[p.name] ?? 0;
+      const r2 = R1_FRI[m]?.[p.name] ?? 0;
+      const total = r1 + r2;
+      // rounds[0] = Thu game, rounds[1] = Fri game (both still Round 1)
+      const rounds = [];
+      if (r1 > 0) rounds[0] = r1;
+      if (r2 > 0) rounds[1] = r2;
+      const lastGame = r2 > 0 ? r2 : r1;
+      s[m][p.name] = { pts: total, lastGame, live: false, rounds };
     }
   }
   return s;
@@ -148,7 +164,7 @@ function loadFromLS() {
     STALE_KEYS.forEach(k => localStorage.removeItem(k));
     const r = localStorage.getItem(LS_KEY);
     if (r) return JSON.parse(r);
-    // No v5 cache yet — seed with Thursday's confirmed scores
+    // No v6 cache yet — seed with confirmed R1 scores
     const seed = buildSeedScores();
     localStorage.setItem(LS_KEY, JSON.stringify(seed));
     return seed;
@@ -159,67 +175,149 @@ function saveToLS(d) { try { localStorage.setItem(LS_KEY, JSON.stringify(d)); } 
 // ─── ESPN FETCH ───────────────────────────────────────────────────────────────
 const PROXY = "https://sharpshooter-proxy.tzottoli.workers.dev";
 
+// Build a set of all team IDs we care about (for filtering scoreboard games)
+const ALL_TEAM_IDS = new Set(
+  Object.values(ROSTERS).flatMap(players => players.map(p => p.teamId))
+);
+
 async function fetchESPNScores() {
   try {
-    const res = await fetch(
-      `${PROXY}/scoreboard?groups=50&limit=100`,
-      { signal: AbortSignal.timeout(10000) }
-    );
-    if (!res.ok) throw new Error("scoreboard failed");
-    const data = await res.json();
+    // ── Step 1: Get scoreboard for today + yesterday to cover round transitions ──
+    // NCAA tournament games may span two calendar days and the default endpoint
+    // (no date param) only shows today. We fetch both days and merge.
+    const today = new Date();
+    const yesterday = new Date(today);
+    yesterday.setDate(yesterday.getDate() - 1);
+    const fmt = d => d.toISOString().slice(0,10).replace(/-/g,"");
 
-    const events = (data?.events || []).filter(e => {
+    const fetchDay = async (dateStr) => {
+      const res = await fetch(
+        `${PROXY}/scoreboard?groups=50&limit=100&dates=${dateStr}`,
+        { signal: AbortSignal.timeout(10000) }
+      );
+      if (!res.ok) return [];
+      const data = await res.json();
+      return data?.events || [];
+    };
+
+    // Fetch both days in parallel; also try no-date for "right now" awareness
+    const [todayEvents, yestEvents, nowEvents] = await Promise.all([
+      fetchDay(fmt(today)),
+      fetchDay(fmt(yesterday)),
+      fetch(`${PROXY}/scoreboard?groups=50&limit=100`, { signal: AbortSignal.timeout(10000) })
+        .then(r => r.ok ? r.json() : {}).then(d => d?.events || [])
+        .catch(() => []),
+    ]);
+
+    // Deduplicate by event id
+    const eventMap = new Map();
+    for (const e of [...yestEvents, ...todayEvents, ...nowEvents]) {
+      if (e.id) eventMap.set(e.id, e);
+    }
+    const allEvents = Array.from(eventMap.values());
+
+    // Find events that involve at least one of our teams
+    const relevantEvents = allEvents.filter(e => {
+      const competitors = e.competitions?.[0]?.competitors || [];
+      return competitors.some(c => ALL_TEAM_IDS.has(c.team?.id));
+    });
+
+    const finishedOrLive = relevantEvents.filter(e => {
       const s = e.status?.type?.name;
       return s === "STATUS_IN_PROGRESS" || s === "STATUS_FINAL";
     });
 
-    if (!events.length) return { playerStats: {}, livePlayerIds: new Set(), eliminatedTeamIds: new Set(), noGamesYet: true };
+    if (!finishedOrLive.length) {
+      return { playerStats: {}, livePlayerIds: new Set(), eliminatedTeamIds: new Set(), noGamesYet: true };
+    }
+
+    // ── Step 2: Build elimination map from scoreboard ─────────────────────────
+    const eliminatedTeamIds = new Set();
+    for (const event of finishedOrLive) {
+      if (event.status?.type?.name !== "STATUS_FINAL") continue;
+      for (const team of event.competitions?.[0]?.competitors || []) {
+        if (team.winner === false) eliminatedTeamIds.add(team.team?.id);
+      }
+    }
+
+    // ── Step 3: Fetch full box scores for each relevant finished/live game ────
+    // Sort by date so round indices are assigned in chronological order
+    const sortedEvents = [...finishedOrLive].sort((a, b) =>
+      new Date(a.date || 0) - new Date(b.date || 0)
+    );
 
     const playerStats = {};
     const livePlayerIds = new Set();
-    const eliminatedTeamIds = new Set();
-
-    // Sort events by start date so round order is correct
-    const sortedEvents = [...events].sort((a, b) =>
-      new Date(a.date || 0) - new Date(b.date || 0)
-    );
-    // Assign a round index per team — track how many completed games each team has played
     const teamGamesPlayed = {};
 
-    for (const event of sortedEvents) {
+    await Promise.all(sortedEvents.map(async (event) => {
+      const gameId = event.id;
       const isFinal = event.status?.type?.name === "STATUS_FINAL";
       const isLive  = event.status?.type?.name === "STATUS_IN_PROGRESS";
-      const competitors = event.competitions?.[0]?.competitors || [];
 
+      // Determine round index for each team in this game (before async)
+      const competitors = event.competitions?.[0]?.competitors || [];
+      const roundIndices = {};
+      for (const team of competitors) {
+        const tid = team.team?.id;
+        roundIndices[tid] = teamGamesPlayed[tid] || 0;
+      }
       if (isFinal) {
         for (const team of competitors) {
-          if (team.winner === false) eliminatedTeamIds.add(team.team?.id);
+          const tid = team.team?.id;
+          teamGamesPlayed[tid] = (teamGamesPlayed[tid] || 0) + 1;
         }
       }
 
-      for (const team of competitors) {
-        const teamId = team.team?.id;
-        const roundIdx = teamGamesPlayed[teamId] || 0;
-        if (isFinal) teamGamesPlayed[teamId] = roundIdx + 1;
+      try {
+        const sumRes = await fetch(
+          `${PROXY}/summary?event=${gameId}`,
+          { signal: AbortSignal.timeout(8000) }
+        );
+        if (!sumRes.ok) return;
+        const sumData = await sumRes.json();
 
-        for (const leaderGroup of team.leaders || []) {
-          if (leaderGroup.name !== "points") continue;
-          for (const leader of leaderGroup.leaders || []) {
-            const id = leader.athlete?.id;
-            const pts = parseFloat(leader.displayValue || 0);
-            if (!id || isNaN(pts) || pts === 0) continue;
-            if (!ESPN_ID_MAP[id]) continue;
-            if (!playerStats[id]) playerStats[id] = { pts: 0, lastGame: 0, live: false, rounds: [] };
-            if (isFinal && playerStats[id].rounds.length <= roundIdx) {
-              playerStats[id].rounds[roundIdx] = pts;
+        // boxscore.players is an array of team groups, each with a statistics array
+        const teamGroups = sumData?.boxscore?.players || [];
+        for (const group of teamGroups) {
+          const teamId = group.team?.id;
+          const roundIdx = roundIndices[teamId] ?? 0;
+
+          // Each group has multiple stat categories; find "points" column
+          for (const statGroup of group.statistics || []) {
+            // Find the index of the "PTS" column in the keys array
+            const keys = statGroup.keys || [];
+            const ptsIdx = keys.indexOf("PTS");
+            if (ptsIdx === -1) continue;
+
+            for (const athlete of statGroup.athletes || []) {
+              const id = athlete.athlete?.id;
+              if (!id || !ESPN_ID_MAP[id]) continue;
+              const statsArr = athlete.stats || [];
+              const ptsRaw = statsArr[ptsIdx];
+              const pts = parseFloat(ptsRaw);
+              if (isNaN(pts) || pts === 0) continue;
+
+              if (!playerStats[id]) playerStats[id] = { pts: 0, lastGame: 0, live: false, rounds: [] };
+              // Only add once per game (guard against duplicate stat groups)
+              if (!playerStats[id]._gamesSeen) playerStats[id]._gamesSeen = new Set();
+              if (playerStats[id]._gamesSeen.has(gameId)) continue;
+              playerStats[id]._gamesSeen.add(gameId);
+
+              if (isFinal) {
+                playerStats[id].rounds[roundIdx] = pts;
+              }
+              playerStats[id].pts += pts;
+              playerStats[id].lastGame = pts;
+              if (isLive) { playerStats[id].live = true; livePlayerIds.add(id); }
             }
-            playerStats[id].pts += pts;
-            playerStats[id].lastGame = pts;
-            if (isLive) { playerStats[id].live = true; livePlayerIds.add(id); }
           }
         }
-      }
-    }
+      } catch { /* box score fetch failed for this game — skip */ }
+    }));
+
+    // Clean up internal tracking field
+    for (const stat of Object.values(playerStats)) delete stat._gamesSeen;
 
     return { playerStats, livePlayerIds, eliminatedTeamIds, noGamesYet: false };
   } catch {
