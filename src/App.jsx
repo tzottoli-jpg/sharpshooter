@@ -1,67 +1,67 @@
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback, useRef, useMemo } from "react";
 
 // ─── ROSTER DATA ─────────────────────────────────────────────────────────────
-// espnId values verified against live ESPN API response 2026-03-19
+// espnId = player ID, teamId = ESPN team ID for auto-elimination tracking
 const ROSTERS = {
   Trent: [
-    { name: "Brayden Burries",      school: "Arizona",    espnId: "4432574",  projected: 88,  seed: 4,  region: "West"    },
-    { name: "Dominique Daniels Jr", school: "Cal Baptist",espnId: null,       projected: 23,  seed: 14, region: "South"   },
-    { name: "Darius Acuff Jr",      school: "Arkansas",   espnId: "5142620",  projected: 68,  seed: 5,  region: "South"   },
-    { name: "Larry Johnson",        school: "McNeese",    espnId: null,       projected: 26,  seed: 13, region: "Midwest" },
-    { name: "Joshua Jefferson",     school: "Iowa State", espnId: "4432843",  projected: 76,  seed: 2,  region: "South"   },
-    { name: "Ja'Kobi Gillespie",    school: "Tennessee",  espnId: "4433289",  projected: 45,  seed: 2,  region: "East"    },
-    { name: "Emmanuel Sharp",       school: "Houston",    espnId: "4433048",  projected: 69,  seed: 3,  region: "Midwest" },
-    { name: "Tyler Tanner",         school: "Vanderbilt", espnId: "5187600",  projected: 48,  seed: 8,  region: "West"    },
+    { name: "Brayden Burries",      school: "Arizona",    espnId: "5082206",  teamId: "12",   projected: 88,  seed: 4,  region: "West"    },
+    { name: "Dominique Daniels Jr", school: "Cal Baptist",espnId: null,       teamId: "2072", projected: 23,  seed: 14, region: "South"   },
+    { name: "Darius Acuff Jr",      school: "Arkansas",   espnId: "5142620",  teamId: "8",    projected: 68,  seed: 5,  region: "South"   },
+    { name: "Larry Johnson",        school: "McNeese",    espnId: null,       teamId: "2377", projected: 26,  seed: 13, region: "Midwest" },
+    { name: "Joshua Jefferson",     school: "Iowa State", espnId: "4870564",  teamId: "66",   projected: 76,  seed: 2,  region: "South"   },
+    { name: "Ja'Kobi Gillespie",    school: "Tennessee",  espnId: "5107968",  teamId: "2633", projected: 45,  seed: 2,  region: "East"    },
+    { name: "Emmanuel Sharp",       school: "Houston",    espnId: "5106058",  teamId: "248",  projected: 69,  seed: 3,  region: "Midwest" },
+    { name: "Tyler Tanner",         school: "Vanderbilt", espnId: "5187600",  teamId: "238",  projected: 48,  seed: 8,  region: "West"    },
   ],
   JB: [
-    { name: "Cam Boozer",           school: "Duke",       espnId: "5041935",  projected: 125, seed: 1,  region: "East"    },
-    { name: "Damari Wheeler",       school: "NDSU",       espnId: "5107273",  projected: 14,  seed: 16, region: "East"    },
-    { name: "Keaton Wagner",        school: "Illinois",   espnId: null,       projected: 63,  seed: 6,  region: "West"    },
-    { name: "John Mobley Jr",       school: "Ohio State", espnId: "5060708",  projected: 20,  seed: 11, region: "South"   },
-    { name: "Jaden Bradley",        school: "Arizona",    espnId: "4433110",  projected: 74,  seed: 4,  region: "West"    },
-    { name: "Ryan Conwell",         school: "Louisville", espnId: "5107157",  projected: 47,  seed: 7,  region: "West"    },
-    { name: "Elliot Cadeau",        school: "Michigan",   espnId: "4869764",  projected: 69,  seed: 1,  region: "Midwest" },
-    { name: "Mirkovic",             school: "Illinois",   espnId: "5311832",  projected: 39,  seed: 6,  region: "West"    },
+    { name: "Cam Boozer",           school: "Duke",       espnId: "5041935",  teamId: "150",  projected: 125, seed: 1,  region: "East"    },
+    { name: "Damari Wheeler",       school: "NDSU",       espnId: "5107273",  teamId: "2449", projected: 14,  seed: 16, region: "East"    },
+    { name: "Keaton Wagner",        school: "Illinois",   espnId: null,       teamId: "356",  projected: 63,  seed: 6,  region: "West"    },
+    { name: "John Mobley Jr",       school: "Ohio State", espnId: "5060708",  teamId: "194",  projected: 20,  seed: 11, region: "South"   },
+    { name: "Jaden Bradley",        school: "Arizona",    espnId: "4432737",  teamId: "12",   projected: 74,  seed: 4,  region: "West"    },
+    { name: "Ryan Conwell",         school: "Louisville", espnId: "5107157",  teamId: "97",   projected: 47,  seed: 7,  region: "West"    },
+    { name: "Elliot Cadeau",        school: "Michigan",   espnId: "4869764",  teamId: "130",  projected: 69,  seed: 1,  region: "Midwest" },
+    { name: "Mirkovic",             school: "Illinois",   espnId: "5311832",  teamId: "356",  projected: 39,  seed: 6,  region: "West"    },
   ],
   Kelly: [
-    { name: "Thomas Haugh",         school: "Florida",    espnId: "4432922",  projected: 94,  seed: 1,  region: "South"   },
-    { name: "Cruz Davis",           school: "Hofstra",    espnId: null,       projected: 20,  seed: 15, region: "East"    },
-    { name: "AJ Dybantsa",          school: "BYU",        espnId: "5142718",  projected: 63,  seed: 6,  region: "Midwest" },
-    { name: "Jeremiah Wilkinson",   school: "Georgia",    espnId: "5165276",  projected: 26,  seed: 8,  region: "South"   },
-    { name: "Graham Ike",           school: "Gonzaga",    espnId: "4703396",  projected: 69,  seed: 5,  region: "West"    },
-    { name: "Tyler Bilodeau",       school: "UCLA",       espnId: null,       projected: 28,  seed: 9,  region: "Midwest" },
-    { name: "Meleek Thomas",        school: "Arkansas",   espnId: "5041951",  projected: 43,  seed: 5,  region: "South"   },
-    { name: "Pryce Sandfort",       school: "Nebraska",   espnId: "4858604",  projected: 25,  seed: 10, region: "West"    },
+    { name: "Thomas Haugh",         school: "Florida",    espnId: "5080489",  teamId: "57",   projected: 94,  seed: 1,  region: "South"   },
+    { name: "Cruz Davis",           school: "Hofstra",    espnId: null,       teamId: "2293", projected: 20,  seed: 15, region: "East"    },
+    { name: "AJ Dybantsa",          school: "BYU",        espnId: "5142718",  teamId: "252",  projected: 63,  seed: 6,  region: "Midwest" },
+    { name: "Jeremiah Wilkinson",   school: "Georgia",    espnId: "5165276",  teamId: "61",   projected: 26,  seed: 8,  region: "South"   },
+    { name: "Graham Ike",           school: "Gonzaga",    espnId: "4703396",  teamId: "2250", projected: 69,  seed: 5,  region: "West"    },
+    { name: "Tyler Bilodeau",       school: "UCLA",       espnId: null,       teamId: "26",   projected: 28,  seed: 9,  region: "Midwest" },
+    { name: "Meleek Thomas",        school: "Arkansas",   espnId: "5041951",  teamId: "8",    projected: 43,  seed: 5,  region: "South"   },
+    { name: "Pryce Sandfort",       school: "Nebraska",   espnId: "4858604",  teamId: "158",  projected: 25,  seed: 10, region: "West"    },
   ],
   Pat: [
-    { name: "Yaxel Lendeborg",      school: "Michigan",   espnId: "4432823",  projected: 79,  seed: 1,  region: "Midwest" },
-    { name: "Preston Edmead",       school: "Hofstra",    espnId: null,       projected: 10,  seed: 15, region: "East"    },
-    { name: "Koa Peat",             school: "Arizona",    espnId: "4683784",  projected: 75,  seed: 4,  region: "West"    },
-    { name: "Bruce Thornton",       school: "Ohio State", espnId: "4432727",  projected: 30,  seed: 11, region: "South"   },
-    { name: "Andrej Stojakovic",    school: "Illinois",   espnId: null,       projected: 47,  seed: 6,  region: "West"    },
-    { name: "Nate Ament",           school: "Tennessee",  espnId: null,       projected: 44,  seed: 2,  region: "East"    },
-    { name: "Alex Karaban",         school: "UConn",      espnId: "4432784",  projected: 54,  seed: 3,  region: "West"    },
-    { name: "Labaron Philon Jr",    school: "Alabama",    espnId: "4683748",  projected: 65,  seed: 1,  region: "South"   },
+    { name: "Yaxel Lendeborg",      school: "Michigan",   espnId: "5175737",  teamId: "130",  projected: 79,  seed: 1,  region: "Midwest" },
+    { name: "Preston Edmead",       school: "Hofstra",    espnId: null,       teamId: "2293", projected: 10,  seed: 15, region: "East"    },
+    { name: "Koa Peat",             school: "Arizona",    espnId: "5041953",  teamId: "12",   projected: 75,  seed: 4,  region: "West"    },
+    { name: "Bruce Thornton",       school: "Ohio State", espnId: "5105837",  teamId: "194",  projected: 30,  seed: 11, region: "South"   },
+    { name: "Andrej Stojakovic",    school: "Illinois",   espnId: "5175007",  teamId: "356",  projected: 47,  seed: 6,  region: "West"    },
+    { name: "Nate Ament",           school: "Tennessee",  espnId: "5164559",       teamId: "2633", projected: 44,  seed: 2,  region: "East"    },
+    { name: "Alex Karaban",         school: "UConn",      espnId: "4917149",  teamId: "41",   projected: 54,  seed: 3,  region: "West"    },
+    { name: "Labaron Philon Jr",    school: "Alabama",    espnId: "4873090",  teamId: "333",  projected: 65,  seed: 1,  region: "South"   },
   ],
   Ben: [
-    { name: "Kingston Flemings",    school: "Houston",    espnId: "5149077",  projected: 74,  seed: 3,  region: "Midwest" },
-    { name: "TJ Power",             school: "Penn",       espnId: null,       projected: 17,  seed: 14, region: "Midwest" },
-    { name: "Isaiah Evans",         school: "Duke",       espnId: "4683760",  projected: 51,  seed: 1,  region: "East"    },
-    { name: "Bennett Stirtz",       school: "Iowa",       espnId: "4432712",  projected: 30,  seed: 12, region: "Midwest" },
-    { name: "Jeremy Fears",         school: "MSU",        espnId: "4711255",  projected: 55,  seed: 2,  region: "West"    },
-    { name: "Malik Reneau",         school: "Miami",      espnId: "4432851",  projected: 37,  seed: 9,  region: "East"    },
-    { name: "Fletcher Loyer",       school: "Purdue",     espnId: "4432870",  projected: 61,  seed: 4,  region: "South"   },
-    { name: "Nick Boyd",            school: "Wisconsin",  espnId: "4702654",  projected: 18,  seed: 10, region: "East"    },
+    { name: "Kingston Flemings",    school: "Houston",    espnId: "5149077",  teamId: "248",  projected: 74,  seed: 3,  region: "Midwest" },
+    { name: "TJ Power",             school: "Penn",       espnId: null,       teamId: "219",  projected: 17,  seed: 14, region: "Midwest" },
+    { name: "Isaiah Evans",         school: "Duke",       espnId: "5061585",  teamId: "150",  projected: 51,  seed: 1,  region: "East"    },
+    { name: "Bennett Stirtz",       school: "Iowa",       espnId: "5241364",  teamId: "2294", projected: 30,  seed: 12, region: "Midwest" },
+    { name: "Jeremy Fears",         school: "MSU",        espnId: "4711255",  teamId: "127",  projected: 55,  seed: 2,  region: "West"    },
+    { name: "Malik Reneau",         school: "Miami",      espnId: "5105798",  teamId: "2390", projected: 37,  seed: 9,  region: "East"    },
+    { name: "Fletcher Loyer",       school: "Purdue",     espnId: "5105853",  teamId: "2509", projected: 61,  seed: 4,  region: "South"   },
+    { name: "Nick Boyd",            school: "Wisconsin",  espnId: "4702654",  teamId: "275",  projected: 18,  seed: 10, region: "East"    },
   ],
   Berit: [
-    { name: "Alex Condon",          school: "Florida",    espnId: "4683700",  projected: 66,  seed: 1,  region: "South"   },
-    { name: "Thomas Dowd",          school: "Troy",       espnId: "5176732",  projected: 15,  seed: 16, region: "Midwest" },
-    { name: "Milan Momcilovic",     school: "Iowa State", espnId: "4683787",  projected: 77,  seed: 2,  region: "South"   },
-    { name: "Mark Mitchell",        school: "Missouri",   espnId: "4432787",  projected: 27,  seed: 8,  region: "West"    },
-    { name: "Morez Johnson Jr",     school: "Michigan",   espnId: "4873153",  projected: 62,  seed: 1,  region: "Midwest" },
-    { name: "Mikel Brown Jr",       school: "Louisville", espnId: null,       projected: 46,  seed: 7,  region: "West"    },
-    { name: "Tarris Reed",          school: "UConn",      espnId: "4432791",  projected: 50,  seed: 3,  region: "West"    },
-    { name: "Daryn Peterson",       school: "Kansas",     espnId: "4683756",  projected: 59,  seed: 1,  region: "East"    },
+    { name: "Alex Condon",          school: "Florida",    espnId: "5174657",  teamId: "57",   projected: 66,  seed: 1,  region: "South"   },
+    { name: "Thomas Dowd",          school: "Troy",       espnId: "5176732",  teamId: "2653", projected: 15,  seed: 16, region: "Midwest" },
+    { name: "Milan Momcilovic",     school: "Iowa State", espnId: "4848637",  teamId: "66",   projected: 77,  seed: 2,  region: "South"   },
+    { name: "Mark Mitchell",        school: "Missouri",   espnId: "4433285",  teamId: "142",  projected: 27,  seed: 8,  region: "West"    },
+    { name: "Morez Johnson Jr",     school: "Michigan",   espnId: "4873153",  teamId: "130",  projected: 62,  seed: 1,  region: "Midwest" },
+    { name: "Dailyn Swain",         school: "Texas",      espnId: "4848625",  teamId: "251",  projected: 46,  seed: 6,  region: "South"   },
+    { name: "Tarris Reed",          school: "UConn",      espnId: "5105809",  teamId: "41",   projected: 50,  seed: 3,  region: "West"    },
+    { name: "Daryn Peterson",       school: "Kansas",     espnId: "5041955",  teamId: "2305", projected: 59,  seed: 1,  region: "East"    },
   ],
 };
 
@@ -101,6 +101,9 @@ const REGIONS = ["West","East","South","Midwest"];
 const REGION_COLORS = { West:"#3b82f6", East:"#ef4444", South:"#22c55e", Midwest:"#a855f7" };
 const MANAGERS = Object.keys(ROSTERS);
 
+// Round label map — used to label per-game scores
+const ROUND_LABELS = ["R1","R2","R3","R4","R5","R6"];
+
 // Build a flat lookup: espnId -> player info, for fast scoring
 const ESPN_ID_MAP = {};
 for (const [manager, players] of Object.entries(ROSTERS)) {
@@ -110,22 +113,16 @@ for (const [manager, players] of Object.entries(ROSTERS)) {
 }
 
 // ─── LOCALSTORAGE ─────────────────────────────────────────────────────────────
-const LS_KEY      = "mm2026_scores_v4";
-const LS_ELIM_KEY = "mm2026_eliminated_v4";
-const STALE_KEYS  = [
+const LS_KEY     = "mm2026_scores_v4";
+const STALE_KEYS = [
   "mm2026_scores","mm2026_scores_v2","mm2026_scores_v3",
-  "mm2026_eliminated","mm2026_eliminated_v2","mm2026_eliminated_v3"
+  "mm2026_eliminated","mm2026_eliminated_v2","mm2026_eliminated_v3","mm2026_eliminated_v4"
 ];
 
-function loadFromLS()    { try { STALE_KEYS.forEach(k=>localStorage.removeItem(k)); const r=localStorage.getItem(LS_KEY);    return r?JSON.parse(r):{}; } catch{return{};} }
-function loadElimFromLS(){ try { const r=localStorage.getItem(LS_ELIM_KEY); return r?JSON.parse(r):{}; } catch{return{};} }
-function saveToLS(d)     { try { localStorage.setItem(LS_KEY,JSON.stringify(d)); } catch{} }
-function saveElimToLS(d) { try { localStorage.setItem(LS_ELIM_KEY,JSON.stringify(d)); } catch{} }
+function loadFromLS() { try { STALE_KEYS.forEach(k=>localStorage.removeItem(k)); const r=localStorage.getItem(LS_KEY); return r?JSON.parse(r):{}; } catch{return{};} }
+function saveToLS(d)  { try { localStorage.setItem(LS_KEY,JSON.stringify(d)); } catch{} }
 
 // ─── ESPN FETCH ───────────────────────────────────────────────────────────────
-// Reads directly from the scoreboard leaders array — no per-game summary calls.
-// The scoreboard response already contains points leaders per game per team,
-// which is enough to score all our drafted players accurately.
 const PROXY = "https://sharpshooter-proxy.tzottoli.workers.dev";
 
 async function fetchESPNScores() {
@@ -142,53 +139,70 @@ async function fetchESPNScores() {
       return s === "STATUS_IN_PROGRESS" || s === "STATUS_FINAL";
     });
 
-    if (!events.length) return { playerStats: {}, livePlayerIds: new Set(), noGamesYet: true };
+    if (!events.length) return { playerStats: {}, livePlayerIds: new Set(), eliminatedTeamIds: new Set(), noGamesYet: true };
 
-    // playerStats: espnId -> { pts, lastGame, live }
     const playerStats = {};
     const livePlayerIds = new Set();
+    const eliminatedTeamIds = new Set();
 
-    for (const event of events) {
-      const isLive = event.status?.type?.name === "STATUS_IN_PROGRESS";
+    // Sort events by start date so round order is correct
+    const sortedEvents = [...events].sort((a, b) =>
+      new Date(a.date || 0) - new Date(b.date || 0)
+    );
+    // Assign a round index per team — track how many completed games each team has played
+    const teamGamesPlayed = {};
+
+    for (const event of sortedEvents) {
+      const isFinal = event.status?.type?.name === "STATUS_FINAL";
+      const isLive  = event.status?.type?.name === "STATUS_IN_PROGRESS";
       const competitors = event.competitions?.[0]?.competitors || [];
 
+      if (isFinal) {
+        for (const team of competitors) {
+          if (team.winner === false) eliminatedTeamIds.add(team.team?.id);
+        }
+      }
+
       for (const team of competitors) {
-        // leaders array: [{name:"points", leaders:[{displayValue:"22", athlete:{id:"..."}}]}]
+        const teamId = team.team?.id;
+        const roundIdx = teamGamesPlayed[teamId] || 0;
+        if (isFinal) teamGamesPlayed[teamId] = roundIdx + 1;
+
         for (const leaderGroup of team.leaders || []) {
           if (leaderGroup.name !== "points") continue;
           for (const leader of leaderGroup.leaders || []) {
             const id = leader.athlete?.id;
             const pts = parseFloat(leader.displayValue || 0);
             if (!id || isNaN(pts) || pts === 0) continue;
-
-            // Only track players we care about
             if (!ESPN_ID_MAP[id]) continue;
-
-            if (!playerStats[id]) playerStats[id] = { pts: 0, lastGame: 0, live: false };
-            // pts in leaders is per-game total, not cumulative across games
-            // We accumulate across multiple games as tournament progresses
+            if (!playerStats[id]) playerStats[id] = { pts: 0, lastGame: 0, live: false, rounds: [] };
+            if (isFinal && playerStats[id].rounds.length <= roundIdx) {
+              playerStats[id].rounds[roundIdx] = pts;
+            }
             playerStats[id].pts += pts;
             playerStats[id].lastGame = pts;
-            if (isLive) {
-              playerStats[id].live = true;
-              livePlayerIds.add(id);
-            }
+            if (isLive) { playerStats[id].live = true; livePlayerIds.add(id); }
           }
         }
       }
     }
 
-    return { playerStats, livePlayerIds, noGamesYet: false };
+    return { playerStats, livePlayerIds, eliminatedTeamIds, noGamesYet: false };
   } catch {
     return null;
   }
+}
+
+// Returns true if a player's team has been eliminated
+function isAutoEliminated(player, eliminatedTeamIds) {
+  return eliminatedTeamIds.has(player.teamId);
 }
 
 function buildZeroScores() {
   const s = {};
   for (const [m, ps] of Object.entries(ROSTERS)) {
     s[m] = {};
-    for (const p of ps) s[m][p.name] = { pts: 0, lastGame: 0, live: false };
+    for (const p of ps) s[m][p.name] = { pts: 0, lastGame: 0, live: false, rounds: [] };
   }
   return s;
 }
@@ -204,18 +218,18 @@ function getManagerActualPts(manager, scores) {
 function getManagerProjPts(manager) {
   return ROSTERS[manager].reduce((s, p) => s + p.projected, 0);
 }
-function getManagerLiveTotal(manager, scores, eliminated) {
+function getManagerLiveTotal(manager, scores, eliminatedTeamIds) {
   const actual = getManagerActualPts(manager, scores);
   const estRem = ROSTERS[manager].reduce((s, p) => {
-    if (eliminated[`${manager}::${p.name}`]) return s;
+    if (isAutoEliminated(p, eliminatedTeamIds)) return s;
     return s + Math.max(0, p.projected - (scores[manager]?.[p.name]?.pts || 0));
   }, 0);
   return actual + estRem;
 }
-function getManagerCeilingFloor(manager, scores, eliminated) {
+function getManagerCeilingFloor(manager, scores, eliminatedTeamIds) {
   const actual = getManagerActualPts(manager, scores);
   const activeRem = ROSTERS[manager].reduce((s, p) => {
-    if (eliminated[`${manager}::${p.name}`]) return s;
+    if (isAutoEliminated(p, eliminatedTeamIds)) return s;
     return s + Math.max(0, p.projected - (scores[manager]?.[p.name]?.pts || 0));
   }, 0);
   return { floor: actual, ceiling: actual + activeRem };
@@ -223,10 +237,10 @@ function getManagerCeilingFloor(manager, scores, eliminated) {
 
 // ─── APP ──────────────────────────────────────────────────────────────────────
 export default function App() {
-  const [scores, setScores]           = useState(loadFromLS);
-  const [eliminated, setEliminated]   = useState(loadElimFromLS);
-  const [lastUpdated, setLastUpdated] = useState(null);
-  const [isLive, setIsLive]           = useState(false);
+  const [scores, setScores]               = useState(loadFromLS);
+  const [eliminatedTeamIds, setEliminatedTeamIds] = useState(new Set());
+  const [lastUpdated, setLastUpdated]     = useState(null);
+  const [isLive, setIsLive]               = useState(false);
   const [livePlayerIds, setLivePlayerIds] = useState(new Set());
   const [expanded, setExpanded]       = useState({});
   const [showReset, setShowReset]     = useState(false);
@@ -235,7 +249,23 @@ export default function App() {
   const [activeTab, setActiveTab]     = useState("scoreboard");
   const [insightsMode, setInsightsMode] = useState("pre");
   const [h2hOpen, setH2hOpen]         = useState(null);
+  const [confetti, setConfetti]       = useState([]);
+  const [momentOfDay, setMomentOfDay] = useState(null);
   const intervalRef = useRef(null);
+  const prevScoresRef = useRef({});
+
+  // Fire confetti when a player scores 30+
+  const fireConfetti = useCallback((color) => {
+    const pieces = Array.from({ length: 60 }, (_, i) => ({
+      id: Date.now() + i,
+      x: Math.random() * 100,
+      color,
+      delay: Math.random() * 0.8,
+      size: 6 + Math.random() * 6,
+    }));
+    setConfetti(pieces);
+    setTimeout(() => setConfetti([]), 3500);
+  }, []);
 
   const scoringHasStarted = dataSource === "espn" &&
     Object.values(scores).some(m => Object.values(m).some(p => p.pts > 0));
@@ -256,12 +286,14 @@ export default function App() {
             pts: stat?.pts ?? 0,
             lastGame: stat?.lastGame ?? 0,
             live: stat?.live ?? false,
+            rounds: stat?.rounds ?? [],
           };
           if (stat?.live && player.espnId) newLiveIds.add(player.espnId);
         }
       }
       saveToLS(newScores);
       setDataSource("espn");
+      setEliminatedTeamIds(espnData.eliminatedTeamIds || new Set());
     } else if (espnData?.noGamesYet) {
       newScores = buildZeroScores();
       setDataSource("none");
@@ -273,7 +305,7 @@ export default function App() {
           newScores[manager] = {};
           for (const player of players) {
             const c = cached[manager]?.[player.name];
-            newScores[manager][player.name] = { pts: c?.pts ?? 0, lastGame: c?.lastGame ?? 0, live: false };
+            newScores[manager][player.name] = { pts: c?.pts ?? 0, lastGame: c?.lastGame ?? 0, live: false, rounds: c?.rounds ?? [] };
           }
         }
         setDataSource("cache");
@@ -288,7 +320,26 @@ export default function App() {
     setIsLive(newLiveIds.size > 0);
     setLastUpdated(new Date());
     setFetchStatus("done");
-  }, []);
+
+    // Detect 30-pt games and best moment
+    let bestGame = null;
+    for (const [manager, players] of Object.entries(ROSTERS)) {
+      for (const player of players) {
+        const d = newScores[manager]?.[player.name] || {};
+        const prev = prevScoresRef.current[manager]?.[player.name] || {};
+        // New 30-pt game just scored?
+        if (d.lastGame >= 30 && d.lastGame !== prev.lastGame) {
+          fireConfetti(MANAGER_COLORS[manager]);
+        }
+        // Track best single-game score across all players
+        if (d.lastGame > 0 && (!bestGame || d.lastGame > bestGame.pts)) {
+          bestGame = { pts: d.lastGame, name: player.name, manager, school: player.school, live: d.live };
+        }
+      }
+    }
+    setMomentOfDay(bestGame);
+    prevScoresRef.current = newScores;
+  }, [fireConfetti]);
 
   useEffect(() => {
     fetchScores();
@@ -296,14 +347,11 @@ export default function App() {
     return () => clearInterval(intervalRef.current);
   }, [fetchScores]);
 
-  const toggleElim = (manager, playerName) => {
-    const key = `${manager}::${playerName}`;
-    setEliminated(prev => { const next = { ...prev, [key]: !prev[key] }; saveElimToLS(next); return next; });
-  };
+
 
   const handleReset = () => {
-    localStorage.removeItem(LS_KEY); localStorage.removeItem(LS_ELIM_KEY);
-    setScores(buildZeroScores()); setEliminated({}); setShowReset(false);
+    localStorage.removeItem(LS_KEY);
+    setScores(buildZeroScores()); setEliminatedTeamIds(new Set()); setShowReset(false);
   };
 
   const formatTime = d => d ? d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" }) : "—";
@@ -318,7 +366,7 @@ export default function App() {
   const projRanking = [...MANAGERS].sort((a, b) => getManagerProjPts(b) - getManagerProjPts(a));
   const insightsIsLive = insightsMode === "live" && scoringHasStarted;
   const rankingManagers = insightsIsLive
-    ? [...MANAGERS].sort((a, b) => getManagerLiveTotal(b, scores, eliminated) - getManagerLiveTotal(a, scores, eliminated))
+    ? [...MANAGERS].sort((a, b) => getManagerLiveTotal(b, scores, eliminatedTeamIds) - getManagerLiveTotal(a, scores, eliminatedTeamIds))
     : [...MANAGERS].sort((a, b) => getManagerProjPts(b) - getManagerProjPts(a));
 
   const sortedByScore = [...MANAGERS].sort((a, b) => {
@@ -326,6 +374,15 @@ export default function App() {
     const bT = Object.values(scores[b] || {}).reduce((s, p) => s + (p.pts || 0), 0);
     return bT - aT;
   });
+
+  // Inject confetti CSS once
+  useEffect(() => {
+    if (document.getElementById("confetti-style")) return;
+    const s = document.createElement("style");
+    s.id = "confetti-style";
+    s.textContent = `@keyframes fall { 0%{transform:translateY(0) rotate(0deg);opacity:.9} 100%{transform:translateY(110vh) rotate(720deg);opacity:0} }`;
+    document.head.appendChild(s);
+  }, []);
 
   return (
     <div style={S.root}>
@@ -365,9 +422,42 @@ export default function App() {
         </div>
       </header>
 
+      {/* CONFETTI OVERLAY */}
+      {confetti.length > 0 && (
+        <div style={{ position: "fixed", inset: 0, pointerEvents: "none", zIndex: 9999, overflow: "hidden" }}>
+          {confetti.map(p => (
+            <div key={p.id} style={{
+              position: "absolute", left: `${p.x}%`, top: "-20px",
+              width: p.size, height: p.size * 0.6, borderRadius: 2,
+              background: p.color, opacity: 0.9,
+              animation: `fall 3s ease-in ${p.delay}s forwards`,
+            }} />
+          ))}
+        </div>
+      )}
+
       {/* ── SCOREBOARD TAB ── */}
       {activeTab === "scoreboard" && (
         <main style={S.main}>
+
+          {/* MOMENT OF THE DAY */}
+          {momentOfDay && momentOfDay.pts > 0 && (
+            <div style={S.momentBanner}>
+              <span style={S.momentFire}>🔥</span>
+              <div style={S.momentBody}>
+                <span style={S.momentLabel}>MOMENT OF THE TOURNAMENT</span>
+                <span style={S.momentText}>
+                  <span style={{ color: MANAGER_COLORS[momentOfDay.manager], fontWeight: 800 }}>{momentOfDay.name}</span>
+                  {" dropped "}
+                  <span style={{ color: "#fbbf24", fontWeight: 900 }}>{momentOfDay.pts} pts</span>
+                  {" for "}
+                  <span style={{ color: MANAGER_COLORS[momentOfDay.manager] }}>{momentOfDay.manager}</span>
+                  {momentOfDay.live ? " 🔴 live" : ""}
+                </span>
+              </div>
+            </div>
+          )}
+
           {sortedByScore.map((manager, rank) => {
             const total = Object.values(scores[manager] || {}).reduce((s, p) => s + (p.pts || 0), 0);
             const proj  = getManagerProjPts(manager);
@@ -390,7 +480,18 @@ export default function App() {
                       <div style={{ ...S.managerName, color }}>
                         {manager}{hasLive && <span style={S.liveTag}>● LIVE</span>}
                       </div>
-                      <div style={S.managerSub}>{players.length} players</div>
+                      <div style={S.managerSub}>
+                        {(() => {
+                          const alive = players.filter(p => !isAutoEliminated(p, eliminatedTeamIds)).length;
+                          const total8 = players.length;
+                          return (
+                            <span>
+                              <span style={{ color: alive > 0 ? "#34d399" : "#ef4444", fontWeight: 700 }}>{alive}</span>
+                              <span style={{ color: "#334155" }}>/{total8} alive</span>
+                            </span>
+                          );
+                        })()}
+                      </div>
                     </div>
                   </div>
                   <div style={S.cardRight}>
@@ -421,7 +522,7 @@ export default function App() {
                     {players.map(player => {
                       const d = pScores[player.name] || {};
                       const pts = d.pts || 0, last = d.lastGame || 0, live = d.live === true;
-                      const eKey = `${manager}::${player.name}`, isElim = eliminated[eKey];
+                      const isElim = isAutoEliminated(player, eliminatedTeamIds);
                       return (
                         <div key={player.name} style={{ ...S.playerRow, opacity: isElim ? 0.38 : 1, background: live ? "rgba(56,189,248,0.04)" : "transparent" }}>
                           <span style={S.cName}>
@@ -437,14 +538,32 @@ export default function App() {
                           <span style={{ ...S.cTotal, fontWeight: 700, color: "#e2e8f0" }}>{pts}</span>
                           <span style={{ ...S.cProj, color: "#475569" }}>{player.projected}</span>
                           <span style={S.cElim}>
-                            <button onClick={() => toggleElim(manager, player.name)}
-                              style={{ ...S.elimBtn, background: isElim ? "#ef4444" : "transparent", borderColor: isElim ? "#ef4444" : "#334155" }}>
-                              {isElim ? "✕" : "○"}
-                            </button>
+                            <span style={{ ...S.elimBtn, background: isElim ? "#334155" : "transparent", borderColor: isElim ? "#475569" : "#1e293b", color: isElim ? "#475569" : "#1e293b", display:"flex", alignItems:"center", justifyContent:"center", fontSize:9 }}>
+                              {isElim ? "OUT" : ""}
+                            </span>
                           </span>
                         </div>
                       );
                     })}
+                    {/* Round-by-round breakdown */}
+                    {(() => {
+                      const maxRounds = Math.max(...players.map(p => (pScores[p.name]?.rounds || []).length), 0);
+                      if (maxRounds === 0) return null;
+                      return (
+                        <div style={S.roundBreakdown}>
+                          <span style={{ color: "#334155", fontSize: 9, letterSpacing:"0.1em", fontWeight:700 }}>ROUND SCORING</span>
+                          {Array.from({ length: maxRounds }, (_, ri) => {
+                            const roundTotal = players.reduce((s, p) => s + (pScores[p.name]?.rounds?.[ri] || 0), 0);
+                            return roundTotal > 0 ? (
+                              <div key={ri} style={S.roundChip}>
+                                <span style={{ color: "#475569", fontSize: 9 }}>{ROUND_LABELS[ri]}</span>
+                                <span style={{ color, fontWeight: 800, fontSize: 12 }}>{roundTotal}</span>
+                              </div>
+                            ) : null;
+                          })}
+                        </div>
+                      );
+                    })()}
                     <div style={S.rowTotal}>
                       <span style={{ color: "#475569", fontSize: 10 }}>TOTALS</span>
                       <span style={{ color, fontWeight: 800, fontSize: 15, marginLeft: "auto" }}>{total} pts</span>
@@ -476,7 +595,7 @@ export default function App() {
       {activeTab === "insights" && (
         <InsightsTab
           scores={scores}
-          eliminated={eliminated}
+          eliminatedTeamIds={eliminatedTeamIds}
           isLive={insightsIsLive}
           insightsMode={insightsMode}
           setInsightsMode={setInsightsMode}
@@ -492,16 +611,16 @@ export default function App() {
 }
 
 // ─── INSIGHTS TAB ─────────────────────────────────────────────────────────────
-function InsightsTab({ scores, eliminated, isLive, insightsMode, setInsightsMode, scoringHasStarted, projRanking, rankingManagers, h2hOpen, setH2hOpen }) {
-  const getMgrPts = m => isLive ? getManagerLiveTotal(m, scores, eliminated) : getManagerProjPts(m);
+function InsightsTab({ scores, eliminatedTeamIds, isLive, insightsMode, setInsightsMode, scoringHasStarted, projRanking, rankingManagers, h2hOpen, setH2hOpen }) {
+  const getMgrPts = m => isLive ? getManagerLiveTotal(m, scores, eliminatedTeamIds) : getManagerProjPts(m);
   const maxPts = Math.max(...MANAGERS.map(getMgrPts), 1);
-  const getCF = m => isLive ? getManagerCeilingFloor(m, scores, eliminated) : STATIC_RANGES[m];
+  const getCF = m => isLive ? getManagerCeilingFloor(m, scores, eliminatedTeamIds) : STATIC_RANGES[m];
   const maxCeiling = Math.max(...MANAGERS.map(m => getCF(m).ceiling), 1);
-  const getH2HPts = m => isLive ? getManagerLiveTotal(m, scores, eliminated) : getManagerProjPts(m);
+  const getH2HPts = m => isLive ? getManagerLiveTotal(m, scores, eliminatedTeamIds) : getManagerProjPts(m);
   const getH2HDetail = m => {
     const actual = getManagerActualPts(m, scores);
     const estRem = ROSTERS[m].reduce((s, p) => {
-      if (eliminated[`${m}::${p.name}`]) return s;
+      if (isAutoEliminated(p, eliminatedTeamIds)) return s;
       return s + Math.max(0, p.projected - (scores[m]?.[p.name]?.pts || 0));
     }, 0);
     return { actual, estRem };
@@ -585,14 +704,14 @@ function InsightsTab({ scores, eliminated, isLive, insightsMode, setInsightsMode
         {MANAGERS.map(manager => {
           const color = MANAGER_COLORS[manager];
           const players = ROSTERS[manager];
-          const activeCt = players.filter(p => !eliminated[`${manager}::${p.name}`]).length;
+          const activeCt = players.filter(p => !isAutoEliminated(p, eliminatedTeamIds)).length;
           return (
             <div key={manager} style={I.sdRow}>
               <div style={{ ...I.sdName, color }}>{manager}</div>
               <div style={I.sdDots}>
                 {players.map((p, i) => {
                   const tier = getTierForSeed(p.seed);
-                  const isElim = eliminated[`${manager}::${p.name}`] || false;
+                  const isElim = isAutoEliminated(p, eliminatedTeamIds);
                   return (
                     <div key={i} title={`${p.name} (${p.school}) — Seed ${p.seed}${isElim ? " [ELIM]" : ""}`}
                       style={{ ...I.seedDot, background: isElim ? "#1e293b" : tier.color, border: `1px solid ${tier.color}${isElim ? "44" : ""}`, opacity: isElim ? 0.35 : 1 }} />
@@ -624,13 +743,13 @@ function InsightsTab({ scores, eliminated, isLive, insightsMode, setInsightsMode
                       <span style={I.regionNone}>none ⚠️</span>
                     </div>
                   );
-                  const activeCt = rp.filter(p => !eliminated[`${manager}::${p.name}`]).length;
+                  const activeCt = rp.filter(p => !isAutoEliminated(p, eliminatedTeamIds)).length;
                   return (
                     <div key={manager} style={I.regionRow}>
                       <span style={{ ...I.regionMgrName, color: MANAGER_COLORS[manager] }}>{manager}</span>
                       <div style={I.regionPlayerDots}>
                         {rp.map((p, i) => {
-                          const isElim = eliminated[`${manager}::${p.name}`] || false;
+                          const isElim = isAutoEliminated(p, eliminatedTeamIds);
                           return <div key={i} title={`${p.name}${isElim ? " [ELIM]" : ""}`}
                             style={{ ...I.regionDot, background: isElim ? "#1e293b" : MANAGER_COLORS[manager], opacity: isElim ? 0.3 : 1 }} />;
                         })}
@@ -734,6 +853,50 @@ function InsightsTab({ scores, eliminated, isLive, insightsMode, setInsightsMode
           {isLive ? "Values = actual pts + est remaining · Click any cell for breakdown" : "Values = projected totals · Click any cell for breakdown"}
         </div>
       </Section>
+
+      {/* WHO NEEDS A MIRACLE */}
+      {isLive && (() => {
+        const sorted = [...MANAGERS].sort((a, b) => getManagerActualPts(b, scores) - getManagerActualPts(a, scores));
+        const leader = sorted[0];
+        const leaderPts = getManagerActualPts(leader, scores);
+        const miracles = sorted.slice(1).map(m => {
+          const actual = getManagerActualPts(m, scores);
+          const ceiling = getManagerCeilingFloor(m, scores, eliminatedTeamIds).ceiling;
+          const gap = leaderPts - actual;
+          const canCatch = ceiling > leaderPts;
+          return { manager: m, actual, ceiling, gap, canCatch };
+        }).filter(x => x.gap > 0);
+        if (!miracles.length) return null;
+        return (
+          <Section title="Who Needs a Miracle?" icon="🙏">
+            {miracles.map(({ manager, actual, ceiling, gap, canCatch }) => {
+              const color = MANAGER_COLORS[manager];
+              return (
+                <div key={manager} style={I.miracleRow}>
+                  <span style={{ ...I.miracleName, color }}>{manager}</span>
+                  <div style={I.miracleBody}>
+                    <div style={I.miracleBar}>
+                      <div style={{ ...I.miracleBarFill, width: `${Math.min((actual / (leaderPts || 1)) * 100, 100)}%`, background: color + "66" }} />
+                      <div style={{ ...I.miracleBarCeil, width: `${Math.min((ceiling / (leaderPts || 1)) * 100, 100)}%`, background: color + "22" }} />
+                    </div>
+                    <div style={I.miracleMeta}>
+                      <span style={{ color: "#475569", fontSize: 10 }}>
+                        <span style={{ color }}>{actual}</span> pts · ceiling <span style={{ color: canCatch ? "#34d399" : "#ef4444" }}>{ceiling}</span>
+                      </span>
+                      <span style={{ fontSize: 10, color: canCatch ? "#34d399" : "#ef4444", fontWeight: 700 }}>
+                        {canCatch ? `↑ ${gap} back, can catch` : `↑ ${gap} back, can't catch`}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+            <div style={{ fontSize: 10, color: "#334155", textAlign: "center", marginTop: 4 }}>
+              Ceiling = actual pts + est remaining for active players
+            </div>
+          </Section>
+        );
+      })()}
     </main>
   );
 }
@@ -828,7 +991,14 @@ const S = {
   resetBtn:    { background: "transparent", border: "1px solid #334155", color: "#64748b", borderRadius: 4, padding: "8px 20px", fontSize: 12, cursor: "pointer", letterSpacing: "0.08em", fontWeight: 600 },
   resetConfirm:{ display: "flex", flexDirection: "column", alignItems: "center", gap: 8, background: "rgba(239,68,68,0.06)", border: "1px solid rgba(239,68,68,0.2)", borderRadius: 8, padding: "12px 20px" },
   cancelBtn:   { background: "transparent", border: "1px solid #334155", color: "#94a3b8", borderRadius: 4, padding: "6px 16px", fontSize: 12, cursor: "pointer" },
-  footer:      { textAlign: "center", fontSize: 9, color: "#1e293b", letterSpacing: "0.05em", padding: "8px 0", lineHeight: 1.6 },
+  footer:        { textAlign: "center", fontSize: 9, color: "#1e293b", letterSpacing: "0.05em", padding: "8px 0", lineHeight: 1.6 },
+  momentBanner:  { display: "flex", alignItems: "center", gap: 10, background: "linear-gradient(135deg,rgba(251,191,36,0.12),rgba(251,191,36,0.04))", border: "1px solid rgba(251,191,36,0.3)", borderRadius: 10, padding: "10px 14px" },
+  momentFire:    { fontSize: 22, flexShrink: 0 },
+  momentBody:    { display: "flex", flexDirection: "column", gap: 2, minWidth: 0 },
+  momentLabel:   { fontSize: 8, color: "#fbbf24", letterSpacing: "0.15em", fontWeight: 700 },
+  momentText:    { fontSize: 13, color: "#e2e8f0", lineHeight: 1.4 },
+  roundBreakdown:{ display: "flex", alignItems: "center", gap: 8, padding: "6px 0 2px", flexWrap: "wrap" },
+  roundChip:     { display: "flex", flexDirection: "column", alignItems: "center", background: "rgba(255,255,255,0.04)", borderRadius: 4, padding: "3px 6px", gap: 1 },
 };
 
 const I = {
@@ -891,4 +1061,11 @@ const I = {
   h2hDetailHeader:  { display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12, fontSize: 15, fontWeight: 800 },
   h2hDetailRow:     { display: "flex", gap: 0 },
   h2hClose:         { marginTop: 12, width: "100%", background: "transparent", border: "1px solid #1e293b", color: "#475569", borderRadius: 4, padding: "6px", fontSize: 11, cursor: "pointer", letterSpacing: "0.06em" },
+  miracleRow:       { display: "flex", alignItems: "flex-start", gap: 10 },
+  miracleName:      { width: 44, fontSize: 13, fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.04em", flexShrink: 0, paddingTop: 2 },
+  miracleBody:      { flex: 1, minWidth: 0 },
+  miracleBar:       { height: 8, background: "rgba(255,255,255,0.04)", borderRadius: 4, position: "relative", overflow: "hidden", marginBottom: 4 },
+  miracleBarFill:   { position: "absolute", top: 0, left: 0, height: "100%", borderRadius: 4, transition: "width 0.5s ease" },
+  miracleBarCeil:   { position: "absolute", top: 0, left: 0, height: "100%", borderRadius: 4, transition: "width 0.5s ease" },
+  miracleMeta:      { display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 4 },
 };
