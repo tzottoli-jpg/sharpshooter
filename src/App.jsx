@@ -4,64 +4,64 @@ import { useState, useEffect, useCallback, useRef, useMemo } from "react";
 // espnId = player ID, teamId = ESPN team ID for auto-elimination tracking
 const ROSTERS = {
   Trent: [
-    { name: "Brayden Burries",      school: "Arizona",    espnId: "5082206",  teamId: "12",   projected: 88,  seed: 4,  region: "West"    },
-    { name: "Dominique Daniels Jr", school: "Cal Baptist",espnId: "5178207",  teamId: "2072", projected: 23,  seed: 14, region: "South"   },
-    { name: "Darius Acuff Jr",      school: "Arkansas",   espnId: "5142620",  teamId: "8",    projected: 68,  seed: 5,  region: "South"   },
-    { name: "Larry Johnson",        school: "McNeese",    espnId: "5144375",  teamId: "2377", projected: 26,  seed: 13, region: "Midwest" },
-    { name: "Joshua Jefferson",     school: "Iowa State", espnId: "4870564",  teamId: "66",   projected: 76,  seed: 2,  region: "South"   },
-    { name: "Ja'Kobi Gillespie",    school: "Tennessee",  espnId: "5107968",  teamId: "2633", projected: 45,  seed: 2,  region: "East"    },
-    { name: "Emmanuel Sharp",       school: "Houston",    espnId: "5106058",  teamId: "248",  projected: 69,  seed: 3,  region: "Midwest" },
-    { name: "Tyler Tanner",         school: "Vanderbilt", espnId: "5187600",  teamId: "238",  projected: 48,  seed: 8,  region: "West"    },
+    { name: "Brayden Burries",      school: "Arizona",    espnId: "5082206",  teamId: "12",   projected: 88,  seed: 1,  region: "West"    },
+    { name: "Dominique Daniels Jr", school: "Cal Baptist",espnId: "5178207",  teamId: "2072", projected: 23,  seed: 13, region: "East"    },
+    { name: "Darius Acuff Jr",      school: "Arkansas",   espnId: "5142620",  teamId: "8",    projected: 68,  seed: 4,  region: "West"    },
+    { name: "Larry Johnson",        school: "McNeese",    espnId: "5144375",  teamId: "2377", projected: 26,  seed: 12, region: "South"   },
+    { name: "Joshua Jefferson",     school: "Iowa State", espnId: "4870564",  teamId: "66",   projected: 76,  seed: 2,  region: "Midwest" },
+    { name: "Ja'Kobi Gillespie",    school: "Tennessee",  espnId: "5107968",  teamId: "2633", projected: 45,  seed: 6,  region: "Midwest" },
+    { name: "Emmanuel Sharp",       school: "Houston",    espnId: "5106058",  teamId: "248",  projected: 69,  seed: 2,  region: "South"   },
+    { name: "Tyler Tanner",         school: "Vanderbilt", espnId: "5187600",  teamId: "238",  projected: 48,  seed: 5,  region: "South"   },
   ],
   JB: [
     { name: "Cam Boozer",           school: "Duke",       espnId: "5041935",  teamId: "150",  projected: 125, seed: 1,  region: "East"    },
-    { name: "Damari Wheeler",       school: "NDSU",       espnId: "5107273",  teamId: "2449", projected: 14,  seed: 16, region: "East"    },
-    { name: "Keaton Wagler",        school: "Illinois",   espnId: "5254165",  teamId: "356",  projected: 63,  seed: 6,  region: "West"    },
-    { name: "John Mobley Jr",       school: "Ohio State", espnId: "5060708",  teamId: "194",  projected: 20,  seed: 11, region: "South"   },
-    { name: "Jaden Bradley",        school: "Arizona",    espnId: "4432737",  teamId: "12",   projected: 74,  seed: 4,  region: "West"    },
-    { name: "Ryan Conwell",         school: "Louisville", espnId: "5107157",  teamId: "97",   projected: 47,  seed: 7,  region: "West"    },
+    { name: "Damari Wheeler",       school: "NDSU",       espnId: "5107273",  teamId: "2449", projected: 14,  seed: 14, region: "East"    },
+    { name: "Keaton Wagler",        school: "Illinois",   espnId: "5254165",  teamId: "356",  projected: 63,  seed: 3,  region: "South"   },
+    { name: "John Mobley Jr",       school: "Ohio State", espnId: "5060708",  teamId: "194",  projected: 20,  seed: 8,  region: "East"    },
+    { name: "Jaden Bradley",        school: "Arizona",    espnId: "4432737",  teamId: "12",   projected: 74,  seed: 1,  region: "West"    },
+    { name: "Ryan Conwell",         school: "Louisville", espnId: "5107157",  teamId: "97",   projected: 47,  seed: 6,  region: "East"    },
     { name: "Elliot Cadeau",        school: "Michigan",   espnId: "4869764",  teamId: "130",  projected: 69,  seed: 1,  region: "Midwest" },
-    { name: "Mirkovic",             school: "Illinois",   espnId: "5311832",  teamId: "356",  projected: 39,  seed: 6,  region: "West"    },
+    { name: "Mirkovic",             school: "Illinois",   espnId: "5311832",  teamId: "356",  projected: 39,  seed: 3,  region: "South"   },
   ],
   Kelly: [
     { name: "Thomas Haugh",         school: "Florida",    espnId: "5080489",  teamId: "57",   projected: 94,  seed: 1,  region: "South"   },
-    { name: "Cruz Davis",           school: "Hofstra",    espnId: "5107198",  teamId: "2293", projected: 20,  seed: 15, region: "East"    },
-    { name: "AJ Dybantsa",          school: "BYU",        espnId: "5142718",  teamId: "252",  projected: 63,  seed: 6,  region: "Midwest" },
-    { name: "Jeremiah Wilkinson",   school: "Georgia",    espnId: "5165276",  teamId: "61",   projected: 26,  seed: 8,  region: "South"   },
-    { name: "Graham Ike",           school: "Gonzaga",    espnId: "4703396",  teamId: "2250", projected: 69,  seed: 5,  region: "West"    },
-    { name: "Tyler Bilodeau",       school: "UCLA",       espnId: "5105626",  teamId: "26",   projected: 28,  seed: 9,  region: "Midwest" },
-    { name: "Meleek Thomas",        school: "Arkansas",   espnId: "5041951",  teamId: "8",    projected: 43,  seed: 5,  region: "South"   },
-    { name: "Pryce Sandfort",       school: "Nebraska",   espnId: "4858604",  teamId: "158",  projected: 25,  seed: 10, region: "West"    },
+    { name: "Cruz Davis",           school: "Hofstra",    espnId: "5107198",  teamId: "2293", projected: 20,  seed: 13, region: "Midwest" },
+    { name: "AJ Dybantsa",          school: "BYU",        espnId: "5142718",  teamId: "252",  projected: 63,  seed: 6,  region: "West"    },
+    { name: "Jeremiah Wilkinson",   school: "Georgia",    espnId: "5165276",  teamId: "61",   projected: 26,  seed: 8,  region: "Midwest" },
+    { name: "Graham Ike",           school: "Gonzaga",    espnId: "4703396",  teamId: "2250", projected: 69,  seed: 3,  region: "West"    },
+    { name: "Tyler Bilodeau",       school: "UCLA",       espnId: "5105626",  teamId: "26",   projected: 28,  seed: 7,  region: "East"    },
+    { name: "Meleek Thomas",        school: "Arkansas",   espnId: "5041951",  teamId: "8",    projected: 43,  seed: 4,  region: "West"    },
+    { name: "Pryce Sandfort",       school: "Nebraska",   espnId: "4858604",  teamId: "158",  projected: 25,  seed: 4,  region: "West"    },
   ],
   Pat: [
     { name: "Yaxel Lendeborg",      school: "Michigan",   espnId: "5175737",  teamId: "130",  projected: 79,  seed: 1,  region: "Midwest" },
-    { name: "Preston Edmead",       school: "Hofstra",    espnId: "5236222",  teamId: "2293", projected: 10,  seed: 15, region: "East"    },
-    { name: "Koa Peat",             school: "Arizona",    espnId: "5041953",  teamId: "12",   projected: 75,  seed: 4,  region: "West"    },
-    { name: "Bruce Thornton",       school: "Ohio State", espnId: "5105837",  teamId: "194",  projected: 30,  seed: 11, region: "South"   },
-    { name: "Andrej Stojakovic",    school: "Illinois",   espnId: "5175007",  teamId: "356",  projected: 47,  seed: 6,  region: "West"    },
-    { name: "Nate Ament",           school: "Tennessee",  espnId: "5164559",  teamId: "2633", projected: 44,  seed: 2,  region: "East"    },
-    { name: "Alex Karaban",         school: "UConn",      espnId: "4917149",  teamId: "41",   projected: 54,  seed: 3,  region: "West"    },
-    { name: "Labaron Philon Jr",    school: "Alabama",    espnId: "4873090",  teamId: "333",  projected: 65,  seed: 1,  region: "South"   },
+    { name: "Preston Edmead",       school: "Hofstra",    espnId: "5236222",  teamId: "2293", projected: 10,  seed: 13, region: "Midwest" },
+    { name: "Koa Peat",             school: "Arizona",    espnId: "5041953",  teamId: "12",   projected: 75,  seed: 1,  region: "West"    },
+    { name: "Bruce Thornton",       school: "Ohio State", espnId: "5105837",  teamId: "194",  projected: 30,  seed: 8,  region: "East"    },
+    { name: "Andrej Stojakovic",    school: "Illinois",   espnId: "5175007",  teamId: "356",  projected: 47,  seed: 3,  region: "South"   },
+    { name: "Nate Ament",           school: "Tennessee",  espnId: "5164559",  teamId: "2633", projected: 44,  seed: 6,  region: "Midwest" },
+    { name: "Alex Karaban",         school: "UConn",      espnId: "4917149",  teamId: "41",   projected: 54,  seed: 2,  region: "East"    },
+    { name: "Labaron Philon Jr",    school: "Alabama",    espnId: "4873090",  teamId: "333",  projected: 65,  seed: 4,  region: "Midwest" },
   ],
   Ben: [
-    { name: "Kingston Flemings",    school: "Houston",    espnId: "5149077",  teamId: "248",  projected: 74,  seed: 3,  region: "Midwest" },
-    { name: "TJ Power",             school: "Penn",       espnId: "4684843",  teamId: "219",  projected: 17,  seed: 14, region: "Midwest" },
+    { name: "Kingston Flemings",    school: "Houston",    espnId: "5149077",  teamId: "248",  projected: 74,  seed: 2,  region: "South"   },
+    { name: "TJ Power",             school: "Penn",       espnId: "4684843",  teamId: "219",  projected: 17,  seed: 14, region: "South"   },
     { name: "Isaiah Evans",         school: "Duke",       espnId: "5061585",  teamId: "150",  projected: 51,  seed: 1,  region: "East"    },
-    { name: "Bennett Stirtz",       school: "Iowa",       espnId: "5241364",  teamId: "2294", projected: 30,  seed: 12, region: "Midwest" },
-    { name: "Jeremy Fears",         school: "MSU",        espnId: "4711255",  teamId: "127",  projected: 55,  seed: 2,  region: "West"    },
-    { name: "Malik Reneau",         school: "Miami",      espnId: "5105798",  teamId: "2390", projected: 37,  seed: 9,  region: "East"    },
-    { name: "Fletcher Loyer",       school: "Purdue",     espnId: "5105853",  teamId: "2509", projected: 61,  seed: 4,  region: "South"   },
-    { name: "Nick Boyd",            school: "Wisconsin",  espnId: "4702654",  teamId: "275",  projected: 18,  seed: 10, region: "East"    },
+    { name: "Bennett Stirtz",       school: "Iowa",       espnId: "5241364",  teamId: "2294", projected: 30,  seed: 9,  region: "South"   },
+    { name: "Jeremy Fears",         school: "MSU",        espnId: "4711255",  teamId: "127",  projected: 55,  seed: 3,  region: "East"    },
+    { name: "Malik Reneau",         school: "Miami",      espnId: "5105798",  teamId: "2390", projected: 37,  seed: 7,  region: "West"    },
+    { name: "Fletcher Loyer",       school: "Purdue",     espnId: "5105853",  teamId: "2509", projected: 61,  seed: 2,  region: "West"    },
+    { name: "Nick Boyd",            school: "Wisconsin",  espnId: "4702654",  teamId: "275",  projected: 18,  seed: 5,  region: "West"    },
   ],
   Berit: [
     { name: "Alex Condon",          school: "Florida",    espnId: "5174657",  teamId: "57",   projected: 66,  seed: 1,  region: "South"   },
     { name: "Thomas Dowd",          school: "Troy",       espnId: "5176732",  teamId: "2653", projected: 15,  seed: 16, region: "Midwest" },
-    { name: "Milan Momcilovic",     school: "Iowa State", espnId: "4848637",  teamId: "66",   projected: 77,  seed: 2,  region: "South"   },
-    { name: "Mark Mitchell",        school: "Missouri",   espnId: "4433285",  teamId: "142",  projected: 27,  seed: 8,  region: "West"    },
+    { name: "Milan Momcilovic",     school: "Iowa State", espnId: "4848637",  teamId: "66",   projected: 77,  seed: 2,  region: "Midwest" },
+    { name: "Mark Mitchell",        school: "Missouri",   espnId: "4433285",  teamId: "142",  projected: 27,  seed: 10, region: "West"    },
     { name: "Morez Johnson Jr",     school: "Michigan",   espnId: "4873153",  teamId: "130",  projected: 62,  seed: 1,  region: "Midwest" },
-    { name: "Dailyn Swain",         school: "Texas",      espnId: "4848625",  teamId: "251",  projected: 46,  seed: 6,  region: "South"   },
-    { name: "Tarris Reed",          school: "UConn",      espnId: "5105809",  teamId: "41",   projected: 50,  seed: 3,  region: "West"    },
-    { name: "Daryn Peterson",       school: "Kansas",     espnId: "5041955",  teamId: "2305", projected: 59,  seed: 1,  region: "East"    },
+    { name: "Dailyn Swain",         school: "Texas",      espnId: "4848625",  teamId: "251",  projected: 46,  seed: 11, region: "West"    },
+    { name: "Tarris Reed",          school: "UConn",      espnId: "5105809",  teamId: "41",   projected: 50,  seed: 2,  region: "East"    },
+    { name: "Daryn Peterson",       school: "Kansas",     espnId: "5041955",  teamId: "2305", projected: 59,  seed: 4,  region: "East"    },
   ],
 };
 
@@ -71,22 +71,14 @@ const MANAGER_COLORS = {
 };
 
 const SCOUTING = {
-  Trent: "Most balanced roster — deep South coverage with two seed-2 wildcards and high floor.",
-  JB:    "Three seed-1 wildcards is the highest ceiling in the draft — lives and dies with Duke.",
-  Kelly: "Dybantsa has the highest PPG in the draft but no seed-2 wildcards limits the floor.",
-  Pat:   "Two seed-1s on different teams diversifies risk — Philon Jr is the best value pick in the draft.",
-  Ben:   "No seed-1 wildcards is a real ceiling limiter — needs Duke and Purdue to run deep simultaneously.",
-  Berit: "Sneaky dangerous — Momcilovic, Peterson and Reed are all on potential Final Four teams.",
+  Trent: "Two seed-2 studs (Jefferson + Sharp) anchor the South/Midwest. No seed-1s but high floor with Burries and Acuff.",
+  JB:    "Two seed-1s (Boozer + Cadeau) give the highest upside. Wagler + Mirkovic double-stack Illinois as a bonus.",
+  Kelly: "Heavy West Region presence (Ike, Thomas, Sandfort, Dybantsa). Sole seed-1 is Haugh; Dybantsa eliminated R1.",
+  Pat:   "Best defensive wall in the draft — Lendeborg + Karaban + Philon Jr cover three regions. Ament is a sleeper.",
+  Ben:   "Seed-1 Evans + seed-2 pair (Fears + Loyer/Purdue) gives East/West power. Needs Duke and Purdue to run deep.",
+  Berit: "Two seed-1s (Condon + Morez Johnson) plus Momcilovic and Peterson — strongest late-round ceiling in the field.",
 };
 
-const STATIC_RANGES = {
-  Trent: { floor: 180, ceiling: 564 },
-  JB:    { floor: 160, ceiling: 610 },
-  Kelly: { floor: 155, ceiling: 520 },
-  Pat:   { floor: 170, ceiling: 540 },
-  Ben:   { floor: 140, ceiling: 480 },
-  Berit: { floor: 165, ceiling: 530 },
-};
 
 const SEED_TIERS = [
   { label: "Seed 1",    seeds: [1],            color: "#f59e0b" },
@@ -113,9 +105,9 @@ for (const [manager, players] of Object.entries(ROSTERS)) {
 }
 
 // ─── LOCALSTORAGE ─────────────────────────────────────────────────────────────
-const LS_KEY     = "mm2026_scores_v6";
+const LS_KEY     = "mm2026_scores_v7";
 const STALE_KEYS = [
-  "mm2026_scores","mm2026_scores_v2","mm2026_scores_v3","mm2026_scores_v4","mm2026_scores_v5",
+  "mm2026_scores","mm2026_scores_v2","mm2026_scores_v3","mm2026_scores_v4","mm2026_scores_v5","mm2026_scores_v6",
   "mm2026_eliminated","mm2026_eliminated_v2","mm2026_eliminated_v3","mm2026_eliminated_v4"
 ];
 
@@ -134,7 +126,7 @@ const R1_THU = {
 const R1_FRI = {
   Trent: { "Brayden Burries": 18, "Dominique Daniels Jr": 25, "Darius Acuff Jr": 0, "Larry Johnson": 0, "Joshua Jefferson": 2, "Ja'Kobi Gillespie": 29, "Emmanuel Sharp": 0, "Tyler Tanner": 0 },
   JB:    { "Cam Boozer": 0, "Damari Wheeler": 0, "Keaton Wagler": 0, "John Mobley Jr": 0, "Jaden Bradley": 7, "Ryan Conwell": 0, "Elliot Cadeau": 0, "Mirkovic": 0 },
-  Kelly: { "Thomas Haugh": 14, "Cruz Davis": 0, "AJ Dybantsa": 0, "Jeremiah Wilkinson": 0, "Graham Ike": 0, "Tyler Bilodeau": 0, "Meleek Thomas": 0, "Pryce Sandfort": 0 },
+  Kelly: { "Thomas Haugh": 14, "Cruz Davis": 14, "AJ Dybantsa": 0, "Jeremiah Wilkinson": 0, "Graham Ike": 0, "Tyler Bilodeau": 0, "Meleek Thomas": 0, "Pryce Sandfort": 0 },
   Pat:   { "Yaxel Lendeborg": 0, "Preston Edmead": 24, "Koa Peat": 15, "Bruce Thornton": 0, "Andrej Stojakovic": 0, "Nate Ament": 0, "Alex Karaban": 22, "Labaron Philon Jr": 29 },
   Ben:   { "Kingston Flemings": 0, "TJ Power": 0, "Isaiah Evans": 0, "Bennett Stirtz": 16, "Jeremy Fears": 0, "Malik Reneau": 24, "Fletcher Loyer": 14, "Nick Boyd": 0 },
   Berit: { "Alex Condon": 13, "Thomas Dowd": 0, "Milan Momcilovic": 17, "Mark Mitchell": 19, "Morez Johnson Jr": 0, "Dailyn Swain": 0, "Tarris Reed": 31, "Daryn Peterson": 28 },
@@ -539,11 +531,7 @@ export default function App() {
     none:    { label: "○ awaiting tip-off", color: "#475569" },
   }[dataSource] || { label: "—", color: "#475569" };
 
-  const projRanking = [...MANAGERS].sort((a, b) => getManagerProjPts(b) - getManagerProjPts(a));
   const insightsIsLive = insightsMode === "live" && scoringHasStarted;
-  const rankingManagers = insightsIsLive
-    ? [...MANAGERS].sort((a, b) => getManagerLiveTotal(b, scores, eliminatedTeamIds) - getManagerLiveTotal(a, scores, eliminatedTeamIds))
-    : [...MANAGERS].sort((a, b) => getManagerProjPts(b) - getManagerProjPts(a));
 
   const sortedByScore = [...MANAGERS].sort((a, b) => {
     const aT = Object.values(scores[a] || {}).reduce((s, p) => s + (p.pts || 0), 0);
@@ -776,8 +764,6 @@ export default function App() {
           insightsMode={insightsMode}
           setInsightsMode={setInsightsMode}
           scoringHasStarted={scoringHasStarted}
-          projRanking={projRanking}
-          rankingManagers={rankingManagers}
           h2hOpen={h2hOpen}
           setH2hOpen={setH2hOpen}
         />
@@ -787,14 +773,16 @@ export default function App() {
 }
 
 // ─── INSIGHTS TAB ─────────────────────────────────────────────────────────────
-function InsightsTab({ scores, eliminatedTeamIds, isLive, insightsMode, setInsightsMode, scoringHasStarted, projRanking, rankingManagers, h2hOpen, setH2hOpen }) {
-  const getMgrPts = m => isLive ? getManagerLiveTotal(m, scores, eliminatedTeamIds) : getManagerProjPts(m);
-  const maxPts = Math.max(...MANAGERS.map(getMgrPts), 1);
-  const getCF = m => isLive ? getManagerCeilingFloor(m, scores, eliminatedTeamIds) : STATIC_RANGES[m];
-  const maxCeiling = Math.max(...MANAGERS.map(m => getCF(m).ceiling), 1);
-  const getH2HPts = m => isLive ? getManagerLiveTotal(m, scores, eliminatedTeamIds) : getManagerProjPts(m);
+function InsightsTab({ scores, eliminatedTeamIds, isLive, insightsMode, setInsightsMode, scoringHasStarted, h2hOpen, setH2hOpen }) {
+  // Live: actual pts + projected remaining for alive players
+  // Standings: sort by actual pts scored
+  const getActual    = m => getManagerActualPts(m, scores);
+  const getCeiling   = m => getManagerCeilingFloor(m, scores, eliminatedTeamIds).ceiling;
+  const getH2HPts    = m => isLive ? getManagerLiveTotal(m, scores, eliminatedTeamIds) : getManagerProjPts(m);
+  const maxCeiling   = Math.max(...MANAGERS.map(getCeiling), 1);
+  const standingSort = [...MANAGERS].sort((a,b) => getActual(b) - getActual(a));
   const getH2HDetail = m => {
-    const actual = getManagerActualPts(m, scores);
+    const actual = getActual(m);
     const estRem = ROSTERS[m].reduce((s, p) => {
       if (isAutoEliminated(p, eliminatedTeamIds)) return s;
       return s + Math.max(0, p.projected - (scores[m]?.[p.name]?.pts || 0));
@@ -804,275 +792,349 @@ function InsightsTab({ scores, eliminatedTeamIds, isLive, insightsMode, setInsig
 
   return (
     <main style={S.main}>
-      {/* Banner */}
-      <div style={I.banner}>
-        <span style={I.bannerIcon}>ℹ</span>
-        <span style={I.bannerText}>
-          All projections are pre-tournament estimates based on PPG × seed-adjusted expected games. Actual results will vary. Live rankings update automatically once tournament scoring begins.
-        </span>
-      </div>
-
       {/* Mode toggle */}
       <div style={I.modeBar}>
         <button onClick={() => setInsightsMode("pre")}
           style={{ ...I.modeBtn, ...(insightsMode === "pre" ? I.modeBtnActive : {}) }}>
-          Pre-Tournament
+          Roster
         </button>
         <div style={I.modeDivider} />
         <button
           onClick={() => { if (scoringHasStarted) setInsightsMode("live"); }}
           style={{ ...I.modeBtn, ...(insightsMode === "live" ? I.modeBtnActiveLive : {}), opacity: scoringHasStarted ? 1 : 0.4, cursor: scoringHasStarted ? "pointer" : "not-allowed" }}>
           {insightsMode === "live" && scoringHasStarted && <span style={I.livePulse}>●</span>}
-          Live
+          Standings
         </button>
         {!scoringHasStarted && <span style={I.modeHint}>Activates when scoring begins</span>}
       </div>
 
-      {/* POWER RANKINGS */}
-      <Section title="Power Rankings" icon="🏆">
-        {rankingManagers.map((manager, rank) => {
-          const pts = getMgrPts(manager);
-          const pct = Math.round((pts / maxPts) * 100);
-          const color = MANAGER_COLORS[manager];
-          const projRank = projRanking.indexOf(manager);
-          const rankDelta = isLive ? (projRank - rank) : null;
-          return (
-            <div key={manager} style={I.prCard}>
-              <div style={{ ...I.prRank, background: rank===0?"#fbbf24":rank===1?"#94a3b8":rank===2?"#c97c3a":"#1e293b", color: rank<3?"#0f172a":"#94a3b8" }}>
-                {rank + 1}
-              </div>
-              <div style={I.prBody}>
-                <div style={I.prTop}>
-                  <div style={I.prLeft}>
-                    <span style={{ ...I.prName, color }}>{manager}</span>
-                    {isLive && rankDelta !== null && rankDelta !== 0 && (
-                      <span style={{ ...I.delta, color: rankDelta > 0 ? "#34d399" : "#f43f5e" }}>
-                        {rankDelta > 0 ? "▲" : "▼"}{Math.abs(rankDelta)}
-                      </span>
-                    )}
-                    {isLive && rankDelta === 0 && <span style={{ ...I.delta, color: "#64748b" }}>—</span>}
-                  </div>
-                  <div style={I.prPtsGroup}>
-                    <span style={{ ...I.prPts, color }}>{pts}</span>
-                    <span style={I.prPtsLabel}>{isLive ? "live" : "proj"}</span>
-                  </div>
-                </div>
-                <div style={I.prBarTrack}>
-                  <div style={{ ...I.prBarFill, width: `${pct}%`, background: color }} />
-                </div>
-                <div style={I.prScout}>{SCOUTING[manager]}</div>
-              </div>
-            </div>
-          );
-        })}
-      </Section>
+      {/* ── STANDINGS MODE ── */}
+      {isLive && <>
 
-      {/* SEED DISTRIBUTION */}
-      <Section title="Seed Distribution" icon="🌱">
-        <div style={I.seedLegend}>
-          {SEED_TIERS.map(t => (
-            <div key={t.label} style={I.seedLegendItem}>
-              <div style={{ width: 10, height: 10, borderRadius: "50%", background: t.color, flexShrink: 0 }} />
-              <span style={{ fontSize: 10, color: "#64748b" }}>{t.label}</span>
-            </div>
-          ))}
-        </div>
-        {MANAGERS.map(manager => {
-          const color = MANAGER_COLORS[manager];
-          const players = ROSTERS[manager];
-          const activeCt = players.filter(p => !isAutoEliminated(p, eliminatedTeamIds)).length;
-          return (
-            <div key={manager} style={I.sdRow}>
-              <div style={{ ...I.sdName, color }}>{manager}</div>
-              <div style={I.sdDots}>
-                {players.map((p, i) => {
-                  const tier = getTierForSeed(p.seed);
-                  const isElim = isAutoEliminated(p, eliminatedTeamIds);
-                  return (
-                    <div key={i} title={`${p.name} (${p.school}) — Seed ${p.seed}${isElim ? " [ELIM]" : ""}`}
-                      style={{ ...I.seedDot, background: isElim ? "#1e293b" : tier.color, border: `1px solid ${tier.color}${isElim ? "44" : ""}`, opacity: isElim ? 0.35 : 1 }} />
-                  );
-                })}
-              </div>
-              <div style={I.sdActive}>
-                <span style={{ color: activeCt > 0 ? "#34d399" : "#ef4444", fontWeight: 700 }}>{activeCt}</span>
-                <span style={{ color: "#475569", fontSize: 9 }}> active</span>
-              </div>
-            </div>
-          );
-        })}
-      </Section>
-
-      {/* REGIONAL COVERAGE */}
-      <Section title="Regional Coverage" icon="🗺️">
-        <div style={I.regionGrid}>
-          {REGIONS.map(region => {
-            const rc = REGION_COLORS[region];
+        {/* LIVE STANDINGS — actual pts + ceiling bar */}
+        <Section title="Standings" icon="🏆">
+          {standingSort.map((manager, rank) => {
+            const actual  = getActual(manager);
+            const ceiling = getCeiling(manager);
+            const color   = MANAGER_COLORS[manager];
+            const activeCt = ROSTERS[manager].filter(p => !isAutoEliminated(p, eliminatedTeamIds)).length;
+            const actualPct  = (actual  / maxCeiling) * 100;
+            const ceilPct    = (ceiling / maxCeiling) * 100;
             return (
-              <div key={region} style={{ ...I.regionCard, borderColor: rc + "44" }}>
-                <div style={{ ...I.regionTitle, color: rc }}>{region}</div>
-                {MANAGERS.map(manager => {
-                  const rp = ROSTERS[manager].filter(p => p.region === region);
-                  if (rp.length === 0) return (
-                    <div key={manager} style={I.regionRow}>
-                      <span style={{ ...I.regionMgrName, color: MANAGER_COLORS[manager] + "88" }}>{manager}</span>
-                      <span style={I.regionNone}>none ⚠️</span>
+              <div key={manager} style={I.prCard}>
+                <div style={{ ...I.prRank, background: rank===0?"#fbbf24":rank===1?"#94a3b8":rank===2?"#c97c3a":"#1e293b", color: rank<3?"#0f172a":"#94a3b8" }}>
+                  {rank + 1}
+                </div>
+                <div style={I.prBody}>
+                  <div style={I.prTop}>
+                    <div style={I.prLeft}>
+                      <span style={{ ...I.prName, color }}>{manager}</span>
+                      <span style={{ fontSize: 10, color: activeCt > 0 ? "#64748b" : "#ef4444", marginLeft: 6 }}>{activeCt} alive</span>
                     </div>
-                  );
-                  const activeCt = rp.filter(p => !isAutoEliminated(p, eliminatedTeamIds)).length;
-                  return (
-                    <div key={manager} style={I.regionRow}>
-                      <span style={{ ...I.regionMgrName, color: MANAGER_COLORS[manager] }}>{manager}</span>
-                      <div style={I.regionPlayerDots}>
-                        {rp.map((p, i) => {
-                          const isElim = isAutoEliminated(p, eliminatedTeamIds);
-                          return <div key={i} title={`${p.name}${isElim ? " [ELIM]" : ""}`}
-                            style={{ ...I.regionDot, background: isElim ? "#1e293b" : MANAGER_COLORS[manager], opacity: isElim ? 0.3 : 1 }} />;
-                        })}
-                      </div>
-                      {isLive && <span style={{ fontSize: 10, color: activeCt > 0 ? "#64748b" : "#ef4444", marginLeft: 4 }}>{activeCt} active</span>}
-                      {!isLive && <span style={{ fontSize: 10, color: "#64748b", marginLeft: 4 }}>{rp.length}</span>}
+                    <div style={I.prPtsGroup}>
+                      <span style={{ ...I.prPts, color }}>{actual}</span>
+                      <span style={{ ...I.prPtsLabel, marginLeft: 4 }}>pts</span>
+                      <span style={{ fontSize: 10, color: "#475569", marginLeft: 8 }}>ceil {ceiling}</span>
                     </div>
-                  );
-                })}
+                  </div>
+                  {/* Stacked bar: solid = scored, faded = potential */}
+                  <div style={I.prBarTrack}>
+                    <div style={{ ...I.prBarFill, width: `${ceilPct}%`, background: color + "28" }} />
+                    <div style={{ ...I.prBarFill, width: `${actualPct}%`, background: color, position: "absolute", top: 0, left: 0 }} />
+                  </div>
+                  <div style={I.prScout}>{SCOUTING[manager]}</div>
+                </div>
               </div>
             );
           })}
-        </div>
-      </Section>
+          <div style={{ fontSize: 10, color: "#334155", textAlign: "center", marginTop: 4 }}>
+            Solid bar = pts scored · Faded = projected remaining for alive players
+          </div>
+        </Section>
 
-      {/* CEILING VS FLOOR */}
-      <Section title="Ceiling vs Floor" icon="📊">
-        {MANAGERS.map(manager => {
-          const color = MANAGER_COLORS[manager];
-          const { floor, ceiling } = getCF(manager);
-          const floorPct = (floor / maxCeiling) * 100;
-          const ceilPct  = (ceiling / maxCeiling) * 100;
-          const rangePct = ceilPct - floorPct;
-          return (
-            <div key={manager} style={I.cfRow}>
-              <div style={{ ...I.cfName, color }}>{manager}</div>
-              <div style={I.cfBarWrap}>
-                <div style={I.cfTrack}>
-                  <div style={{ ...I.cfFill, left: `${floorPct}%`, width: `${Math.max(rangePct, 1)}%`, background: `linear-gradient(90deg,${color}66,${color})` }} />
-                  <div style={{ ...I.cfMarker, left: `${floorPct}%`, background: color + "88" }} />
-                  <div style={{ ...I.cfMarker, left: `${Math.min(ceilPct, 99.5)}%`, background: color }} />
-                </div>
-              </div>
-              <div style={I.cfNums}>
-                <span style={{ color: color + "88", fontSize: 11 }}><b style={{ color: color + "cc" }}>{floor}</b></span>
-                <span style={{ color: "#334155", fontSize: 11, margin: "0 4px" }}>–</span>
-                <span style={{ color, fontSize: 11 }}><b>{ceiling}</b><span style={{ color: "#475569", fontSize: 9 }}>{isLive ? " est" : " proj"}</span></span>
-              </div>
-            </div>
-          );
-        })}
-        <div style={{ marginTop: 8, fontSize: 10, color: "#334155", textAlign: "center" }}>
-          {isLive ? "Floor = actual pts scored · Ceiling = actual + est remaining for active players" : "Static pre-tournament estimates"}
-        </div>
-      </Section>
-
-      {/* HEAD TO HEAD */}
-      <Section title="Head to Head" icon="⚔️">
-        <div style={{ overflowX: "auto" }}>
-          <table style={I.h2hTable}>
-            <thead>
-              <tr>
-                <th style={I.h2hTh}></th>
-                {MANAGERS.map(m => <th key={m} style={{ ...I.h2hTh, color: MANAGER_COLORS[m] }}>{m}</th>)}
-              </tr>
-            </thead>
-            <tbody>
-              {MANAGERS.map(rowM => (
-                <tr key={rowM}>
-                  <td style={{ ...I.h2hTd, color: MANAGER_COLORS[rowM], fontWeight: 800, fontSize: 12, whiteSpace: "nowrap" }}>{rowM}</td>
-                  {MANAGERS.map(colM => {
-                    if (rowM === colM) return <td key={colM} style={{ ...I.h2hTd, ...I.h2hDiag }}>—</td>;
-                    const diff = getH2HPts(rowM) - getH2HPts(colM);
-                    const isOpen = h2hOpen && h2hOpen.row === rowM && h2hOpen.col === colM;
-                    return (
-                      <td key={colM} style={{ ...I.h2hTd, cursor: "pointer" }}
-                        onClick={() => setH2hOpen(isOpen ? null : { row: rowM, col: colM })}>
-                        <div style={{ ...I.h2hCell, background: diff > 0 ? "rgba(52,211,153,0.12)" : "rgba(244,63,94,0.12)", color: diff > 0 ? "#34d399" : "#f43f5e", border: `1px solid ${diff > 0 ? "rgba(52,211,153,0.25)" : "rgba(244,63,94,0.25)"}` }}>
-                          {diff > 0 ? "+" : ""}{diff}
-                        </div>
-                      </td>
-                    );
-                  })}
+        {/* HEAD TO HEAD */}
+        <Section title="Head to Head" icon="⚔️">
+          <div style={{ overflowX: "auto" }}>
+            <table style={I.h2hTable}>
+              <thead>
+                <tr>
+                  <th style={I.h2hTh}></th>
+                  {MANAGERS.map(m => <th key={m} style={{ ...I.h2hTh, color: MANAGER_COLORS[m] }}>{m}</th>)}
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-        {h2hOpen && (() => {
-          const { row, col } = h2hOpen;
-          const rdR = getH2HDetail(row), rdC = getH2HDetail(col);
-          const totalR = getH2HPts(row), totalC = getH2HPts(col);
-          const diff = totalR - totalC;
-          return (
-            <div style={I.h2hDetail}>
-              <div style={I.h2hDetailHeader}>
-                <span style={{ color: MANAGER_COLORS[row], fontWeight: 800 }}>{row}</span>
-                <span style={{ color: diff > 0 ? "#34d399" : "#f43f5e", fontSize: 18, fontWeight: 900 }}>{diff > 0 ? "+" : ""}{diff}</span>
-                <span style={{ color: MANAGER_COLORS[col], fontWeight: 800 }}>{col}</span>
+              </thead>
+              <tbody>
+                {standingSort.map(rowM => (
+                  <tr key={rowM}>
+                    <td style={{ ...I.h2hTd, color: MANAGER_COLORS[rowM], fontWeight: 800, fontSize: 12, whiteSpace: "nowrap" }}>{rowM}</td>
+                    {MANAGERS.map(colM => {
+                      if (rowM === colM) return <td key={colM} style={{ ...I.h2hTd, ...I.h2hDiag }}>—</td>;
+                      const diff = getActual(rowM) - getActual(colM);
+                      const isOpen = h2hOpen && h2hOpen.row === rowM && h2hOpen.col === colM;
+                      return (
+                        <td key={colM} style={{ ...I.h2hTd, cursor: "pointer" }}
+                          onClick={() => setH2hOpen(isOpen ? null : { row: rowM, col: colM })}>
+                          <div style={{ ...I.h2hCell, background: diff > 0 ? "rgba(52,211,153,0.12)" : "rgba(244,63,94,0.12)", color: diff > 0 ? "#34d399" : "#f43f5e", border: `1px solid ${diff > 0 ? "rgba(52,211,153,0.25)" : "rgba(244,63,94,0.25)"}` }}>
+                            {diff > 0 ? "+" : ""}{diff}
+                          </div>
+                        </td>
+                      );
+                    })}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          {h2hOpen && (() => {
+            const { row, col } = h2hOpen;
+            const rdR = getH2HDetail(row), rdC = getH2HDetail(col);
+            const totalR = getActual(row), totalC = getActual(col);
+            const diff = totalR - totalC;
+            return (
+              <div style={I.h2hDetail}>
+                <div style={I.h2hDetailHeader}>
+                  <span style={{ color: MANAGER_COLORS[row], fontWeight: 800 }}>{row}</span>
+                  <span style={{ color: diff > 0 ? "#34d399" : "#f43f5e", fontSize: 18, fontWeight: 900 }}>{diff > 0 ? "+" : ""}{diff}</span>
+                  <span style={{ color: MANAGER_COLORS[col], fontWeight: 800 }}>{col}</span>
+                </div>
+                <div style={I.h2hDetailRow}>
+                  <DetailCol manager={row} data={rdR} total={totalR} isLive={true} />
+                  <div style={{ width: 1, background: "#1e293b", margin: "0 8px" }} />
+                  <DetailCol manager={col} data={rdC} total={totalC} isLive={true} />
+                </div>
+                <button onClick={() => setH2hOpen(null)} style={I.h2hClose}>Close ✕</button>
               </div>
-              <div style={I.h2hDetailRow}>
-                <DetailCol manager={row} data={rdR} total={totalR} isLive={isLive} />
-                <div style={{ width: 1, background: "#1e293b", margin: "0 8px" }} />
-                <DetailCol manager={col} data={rdC} total={totalC} isLive={isLive} />
-              </div>
-              <button onClick={() => setH2hOpen(null)} style={I.h2hClose}>Close ✕</button>
-            </div>
-          );
-        })()}
-        <div style={{ fontSize: 10, color: "#334155", textAlign: "center", marginTop: 8 }}>
-          {isLive ? "Values = actual pts + est remaining · Click any cell for breakdown" : "Values = projected totals · Click any cell for breakdown"}
-        </div>
-      </Section>
+            );
+          })()}
+          <div style={{ fontSize: 10, color: "#334155", textAlign: "center", marginTop: 8 }}>
+            Values = actual pts scored · Click any cell for breakdown
+          </div>
+        </Section>
 
-      {/* WHO NEEDS A MIRACLE */}
-      {isLive && (() => {
-        const sorted = [...MANAGERS].sort((a, b) => getManagerActualPts(b, scores) - getManagerActualPts(a, scores));
-        const leader = sorted[0];
-        const leaderPts = getManagerActualPts(leader, scores);
-        const miracles = sorted.slice(1).map(m => {
-          const actual = getManagerActualPts(m, scores);
-          const ceiling = getManagerCeilingFloor(m, scores, eliminatedTeamIds).ceiling;
-          const gap = leaderPts - actual;
-          const canCatch = ceiling > leaderPts;
-          return { manager: m, actual, ceiling, gap, canCatch };
-        }).filter(x => x.gap > 0);
-        if (!miracles.length) return null;
-        return (
-          <Section title="Who Needs a Miracle?" icon="🙏">
-            {miracles.map(({ manager, actual, ceiling, gap, canCatch }) => {
-              const color = MANAGER_COLORS[manager];
-              return (
-                <div key={manager} style={I.miracleRow}>
-                  <span style={{ ...I.miracleName, color }}>{manager}</span>
-                  <div style={I.miracleBody}>
-                    <div style={I.miracleBar}>
-                      <div style={{ ...I.miracleBarFill, width: `${Math.min((actual / (leaderPts || 1)) * 100, 100)}%`, background: color + "66" }} />
-                      <div style={{ ...I.miracleBarCeil, width: `${Math.min((ceiling / (leaderPts || 1)) * 100, 100)}%`, background: color + "22" }} />
+        {/* WHO NEEDS A MIRACLE */}
+        {(() => {
+          const leader = standingSort[0];
+          const leaderPts = getActual(leader);
+          const others = standingSort.slice(1).map(m => ({
+            manager: m, actual: getActual(m), ceiling: getCeiling(m),
+            gap: leaderPts - getActual(m),
+            canCatch: getCeiling(m) > leaderPts,
+          })).filter(x => x.gap > 0);
+          if (!others.length) return null;
+          return (
+            <Section title="Who Needs a Miracle?" icon="🙏">
+              {others.map(({ manager, actual, ceiling, gap, canCatch }) => {
+                const color = MANAGER_COLORS[manager];
+                return (
+                  <div key={manager} style={{ display: "flex", alignItems: "center", gap: 10, padding: "6px 0", borderBottom: "1px solid rgba(255,255,255,0.04)" }}>
+                    <div style={{ ...I.sdName, color, width: 48 }}>{manager}</div>
+                    <div style={{ flex: 1, fontSize: 11, color: "#64748b" }}>
+                      <span style={{ color }}>{actual}</span> pts · ceil <span style={{ color: canCatch ? "#34d399" : "#ef4444" }}>{ceiling}</span>
                     </div>
-                    <div style={I.miracleMeta}>
-                      <span style={{ color: "#475569", fontSize: 10 }}>
-                        <span style={{ color }}>{actual}</span> pts · ceiling <span style={{ color: canCatch ? "#34d399" : "#ef4444" }}>{ceiling}</span>
-                      </span>
-                      <span style={{ fontSize: 10, color: canCatch ? "#34d399" : "#ef4444", fontWeight: 700 }}>
-                        {canCatch ? `↑ ${gap} back, can catch` : `↑ ${gap} back, can't catch`}
-                      </span>
+                    <div style={{ fontSize: 11, fontWeight: 700, color: canCatch ? "#fbbf24" : "#ef4444", textAlign: "right", minWidth: 80 }}>
+                      {canCatch ? `need +${gap}` : "eliminated"}
                     </div>
                   </div>
+                );
+              })}
+              <div style={{ fontSize: 10, color: "#334155", marginTop: 6, textAlign: "center" }}>
+                Leader: <span style={{ color: MANAGER_COLORS[standingSort[0]] }}>{standingSort[0]}</span> with {getActual(standingSort[0])} pts
+              </div>
+            </Section>
+          );
+        })()}
+      </>}
+
+      {/* ── ROSTER MODE ── */}
+      {!isLive && <>
+
+        {/* SEED DISTRIBUTION — numbered chips, not anonymous dots */}
+        <Section title="Seed Distribution" icon="🌱">
+          {MANAGERS.map(manager => {
+            const color = MANAGER_COLORS[manager];
+            const players = [...ROSTERS[manager]].sort((a,b) => a.seed - b.seed);
+            const activeCt = players.filter(p => !isAutoEliminated(p, eliminatedTeamIds)).length;
+            return (
+              <div key={manager} style={I.sdRow}>
+                <div style={{ ...I.sdName, color }}>{manager}</div>
+                <div style={{ ...I.sdDots, flexWrap: "wrap" }}>
+                  {players.map((p, i) => {
+                    const tier = getTierForSeed(p.seed);
+                    const isElim = isAutoEliminated(p, eliminatedTeamIds);
+                    return (
+                      <div key={i}
+                        title={`${p.name} (${p.school}) — Seed ${p.seed} · ${p.region}${isElim ? " · ELIM" : ""}`}
+                        style={{
+                          width: 22, height: 22, borderRadius: 4,
+                          background: isElim ? "#1e293b" : tier.color + "33",
+                          border: `1px solid ${tier.color}${isElim ? "44" : "99"}`,
+                          color: isElim ? "#334155" : tier.color,
+                          fontSize: 10, fontWeight: 800,
+                          display: "flex", alignItems: "center", justifyContent: "center",
+                          opacity: isElim ? 0.45 : 1,
+                          textDecoration: isElim ? "line-through" : "none",
+                          flexShrink: 0,
+                        }}>
+                        {p.seed}
+                      </div>
+                    );
+                  })}
+                </div>
+                <div style={I.sdActive}>
+                  <span style={{ color: activeCt > 0 ? "#34d399" : "#ef4444", fontWeight: 700 }}>{activeCt}</span>
+                  <span style={{ color: "#475569", fontSize: 9 }}>/8</span>
+                </div>
+              </div>
+            );
+          })}
+          <div style={I.seedLegend}>
+            {SEED_TIERS.map(t => (
+              <div key={t.label} style={I.seedLegendItem}>
+                <div style={{ width: 9, height: 9, borderRadius: 2, background: t.color, flexShrink: 0 }} />
+                <span style={{ fontSize: 9, color: "#64748b" }}>{t.label}</span>
+              </div>
+            ))}
+          </div>
+        </Section>
+
+        {/* REGIONAL COVERAGE */}
+        <Section title="Regional Coverage" icon="🗺️">
+          <div style={I.regionGrid}>
+            {REGIONS.map(region => {
+              const rc = REGION_COLORS[region];
+              return (
+                <div key={region} style={{ ...I.regionCard, borderColor: rc + "44" }}>
+                  <div style={{ ...I.regionTitle, color: rc }}>{region}</div>
+                  {MANAGERS.map(manager => {
+                    const rp = ROSTERS[manager].filter(p => p.region === region);
+                    if (rp.length === 0) return (
+                      <div key={manager} style={I.regionRow}>
+                        <span style={{ ...I.regionMgrName, color: MANAGER_COLORS[manager] + "55", fontSize: 10 }}>{manager}</span>
+                        <span style={{ fontSize: 9, color: "#334155" }}>—</span>
+                      </div>
+                    );
+                    const activeCt = rp.filter(p => !isAutoEliminated(p, eliminatedTeamIds)).length;
+                    return (
+                      <div key={manager} style={I.regionRow}>
+                        <span style={{ ...I.regionMgrName, color: MANAGER_COLORS[manager] }}>{manager}</span>
+                        <div style={{ ...I.regionPlayerDots, flex: 1 }}>
+                          {rp.map((p, i) => {
+                            const isElim = isAutoEliminated(p, eliminatedTeamIds);
+                            const tier = getTierForSeed(p.seed);
+                            return (
+                              <div key={i} title={`${p.name} (${p.school}) S${p.seed}${isElim ? " ELIM" : ""}`}
+                                style={{
+                                  width: 18, height: 18, borderRadius: 3,
+                                  background: isElim ? "#1e293b" : MANAGER_COLORS[manager] + "33",
+                                  border: `1px solid ${MANAGER_COLORS[manager]}${isElim ? "22" : "88"}`,
+                                  color: isElim ? "#334155" : MANAGER_COLORS[manager],
+                                  fontSize: 9, fontWeight: 800,
+                                  display: "flex", alignItems: "center", justifyContent: "center",
+                                  opacity: isElim ? 0.4 : 1,
+                                }}>
+                                {p.seed}
+                              </div>
+                            );
+                          })}
+                        </div>
+                        <span style={{ fontSize: 9, color: activeCt > 0 ? "#64748b" : "#ef4444", minWidth: 18, textAlign: "right" }}>{activeCt}✓</span>
+                      </div>
+                    );
+                  })}
                 </div>
               );
             })}
-            <div style={{ fontSize: 10, color: "#334155", textAlign: "center", marginTop: 4 }}>
-              Ceiling = actual pts + est remaining for active players
-            </div>
-          </Section>
-        );
-      })()}
+          </div>
+        </Section>
+
+        {/* CEILING RACE — uses live data even in roster mode */}
+        <Section title="Ceiling Race" icon="📊">
+          {[...MANAGERS].sort((a,b) => getCeiling(b) - getCeiling(a)).map(manager => {
+            const color   = MANAGER_COLORS[manager];
+            const actual  = getActual(manager);
+            const ceiling = getCeiling(manager);
+            const actualPct  = (actual  / maxCeiling) * 100;
+            const ceilPct    = (ceiling / maxCeiling) * 100;
+            return (
+              <div key={manager} style={I.cfRow}>
+                <div style={{ ...I.cfName, color }}>{manager}</div>
+                <div style={I.cfBarWrap}>
+                  <div style={I.cfTrack}>
+                    <div style={{ ...I.cfFill, left: 0, width: `${ceilPct}%`, background: color + "28" }} />
+                    <div style={{ ...I.cfFill, left: 0, width: `${actualPct}%`, background: color }} />
+                  </div>
+                </div>
+                <div style={I.cfNums}>
+                  <span style={{ color: color + "cc", fontSize: 11 }}><b>{actual}</b></span>
+                  <span style={{ color: "#334155", fontSize: 11, margin: "0 3px" }}>→</span>
+                  <span style={{ color, fontSize: 11 }}><b>{ceiling}</b><span style={{ color: "#475569", fontSize: 9 }}> max</span></span>
+                </div>
+              </div>
+            );
+          })}
+          <div style={{ marginTop: 8, fontSize: 10, color: "#334155", textAlign: "center" }}>
+            Solid = pts scored · Faded = pts remaining if all alive players hit projected
+          </div>
+        </Section>
+
+        {/* H2H in roster mode — projected */}
+        <Section title="Head to Head (projected)" icon="⚔️">
+          <div style={{ overflowX: "auto" }}>
+            <table style={I.h2hTable}>
+              <thead>
+                <tr>
+                  <th style={I.h2hTh}></th>
+                  {MANAGERS.map(m => <th key={m} style={{ ...I.h2hTh, color: MANAGER_COLORS[m] }}>{m}</th>)}
+                </tr>
+              </thead>
+              <tbody>
+                {[...MANAGERS].sort((a,b) => getCeiling(b) - getCeiling(a)).map(rowM => (
+                  <tr key={rowM}>
+                    <td style={{ ...I.h2hTd, color: MANAGER_COLORS[rowM], fontWeight: 800, fontSize: 12, whiteSpace: "nowrap" }}>{rowM}</td>
+                    {MANAGERS.map(colM => {
+                      if (rowM === colM) return <td key={colM} style={{ ...I.h2hTd, ...I.h2hDiag }}>—</td>;
+                      const diff = getCeiling(rowM) - getCeiling(colM);
+                      const isOpen = h2hOpen && h2hOpen.row === rowM && h2hOpen.col === colM;
+                      return (
+                        <td key={colM} style={{ ...I.h2hTd, cursor: "pointer" }}
+                          onClick={() => setH2hOpen(isOpen ? null : { row: rowM, col: colM })}>
+                          <div style={{ ...I.h2hCell, background: diff > 0 ? "rgba(52,211,153,0.12)" : "rgba(244,63,94,0.12)", color: diff > 0 ? "#34d399" : "#f43f5e", border: `1px solid ${diff > 0 ? "rgba(52,211,153,0.25)" : "rgba(244,63,94,0.25)"}` }}>
+                            {diff > 0 ? "+" : ""}{diff}
+                          </div>
+                        </td>
+                      );
+                    })}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          {h2hOpen && (() => {
+            const { row, col } = h2hOpen;
+            const rdR = getH2HDetail(row), rdC = getH2HDetail(col);
+            const totalR = getCeiling(row), totalC = getCeiling(col);
+            const diff = totalR - totalC;
+            return (
+              <div style={I.h2hDetail}>
+                <div style={I.h2hDetailHeader}>
+                  <span style={{ color: MANAGER_COLORS[row], fontWeight: 800 }}>{row}</span>
+                  <span style={{ color: diff > 0 ? "#34d399" : "#f43f5e", fontSize: 18, fontWeight: 900 }}>{diff > 0 ? "+" : ""}{diff}</span>
+                  <span style={{ color: MANAGER_COLORS[col], fontWeight: 800 }}>{col}</span>
+                </div>
+                <div style={I.h2hDetailRow}>
+                  <DetailCol manager={row} data={rdR} total={totalR} isLive={false} />
+                  <div style={{ width: 1, background: "#1e293b", margin: "0 8px" }} />
+                  <DetailCol manager={col} data={rdC} total={totalC} isLive={false} />
+                </div>
+                <button onClick={() => setH2hOpen(null)} style={I.h2hClose}>Close ✕</button>
+              </div>
+            );
+          })()}
+          <div style={{ fontSize: 10, color: "#334155", textAlign: "center", marginTop: 8 }}>
+            Values = actual + projected remaining for alive players · Click any cell for breakdown
+          </div>
+        </Section>
+      </>}
+
     </main>
   );
 }
@@ -1203,7 +1265,7 @@ const I = {
   prPtsGroup:       { display: "flex", alignItems: "baseline", gap: 4 },
   prPts:            { fontSize: 20, fontWeight: 900, lineHeight: 1 },
   prPtsLabel:       { fontSize: 9, color: "#475569", letterSpacing: "0.1em" },
-  prBarTrack:       { height: 4, background: "rgba(255,255,255,0.05)", borderRadius: 2, marginBottom: 6 },
+  prBarTrack:       { height: 4, background: "rgba(255,255,255,0.05)", borderRadius: 2, marginBottom: 6, position: "relative" },
   prBarFill:        { height: "100%", borderRadius: 2, transition: "width 0.6s ease" },
   prScout:          { fontSize: 11, color: "#64748b", lineHeight: 1.4 },
   seedLegend:       { display: "flex", flexWrap: "wrap", gap: "6px 12px", paddingBottom: 8, borderBottom: "1px solid rgba(255,255,255,0.04)", marginBottom: 6 },
