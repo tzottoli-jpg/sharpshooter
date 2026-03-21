@@ -113,14 +113,48 @@ for (const [manager, players] of Object.entries(ROSTERS)) {
 }
 
 // ─── LOCALSTORAGE ─────────────────────────────────────────────────────────────
-const LS_KEY     = "mm2026_scores_v4";
+const LS_KEY     = "mm2026_scores_v5";
 const STALE_KEYS = [
-  "mm2026_scores","mm2026_scores_v2","mm2026_scores_v3",
+  "mm2026_scores","mm2026_scores_v2","mm2026_scores_v3","mm2026_scores_v4",
   "mm2026_eliminated","mm2026_eliminated_v2","mm2026_eliminated_v3","mm2026_eliminated_v4"
 ];
 
-function loadFromLS() { try { STALE_KEYS.forEach(k=>localStorage.removeItem(k)); const r=localStorage.getItem(LS_KEY); return r?JSON.parse(r):{}; } catch{return{};} }
-function saveToLS(d)  { try { localStorage.setItem(LS_KEY,JSON.stringify(d)); } catch{} }
+// Thursday R1 confirmed scores from the league spreadsheet.
+// These seed the cache so Round 1 points are never lost even if ESPN drops them.
+// Zero means the player had no points (eliminated early, didn't play, or null ID).
+const THURSDAY_SEED = {
+  Trent: { "Brayden Burries": 0, "Dominique Daniels Jr": 0, "Darius Acuff Jr": 24, "Larry Johnson": 15, "Joshua Jefferson": 0, "Ja'Kobi Gillespie": 0, "Emmanuel Sharp": 16, "Tyler Tanner": 26 },
+  JB:    { "Cam Boozer": 22, "Damari Wheeler": 16, "Keaton Wagner": 18, "John Mobley Jr": 15, "Jaden Bradley": 0, "Ryan Conwell": 18, "Elliot Cadeau": 5, "Mirkovic": 29 },
+  Kelly: { "Thomas Haugh": 0, "Cruz Davis": 0, "AJ Dybantsa": 35, "Jeremiah Wilkinson": 30, "Graham Ike": 19, "Tyler Bilodeau": 0, "Meleek Thomas": 21, "Pryce Sandfort": 23 },
+  Pat:   { "Yaxel Lendeborg": 9, "Preston Edmead": 0, "Koa Peat": 0, "Bruce Thornton": 10, "Andrej Stojakovic": 9, "Nate Ament": 0, "Alex Karaban": 0, "Labaron Philon Jr": 0 },
+  Ben:   { "Kingston Flemings": 18, "TJ Power": 6, "Isaiah Evans": 16, "Bennett Stirtz": 0, "Jeremy Fears": 7, "Malik Reneau": 0, "Fletcher Loyer": 0, "Nick Boyd": 27 },
+  Berit: { "Alex Condon": 0, "Thomas Dowd": 4, "Milan Momcilovic": 0, "Mark Mitchell": 0, "Morez Johnson Jr": 21, "Dailyn Swain": 14, "Tarris Reed": 0, "Daryn Peterson": 0 },
+};
+
+function buildSeedScores() {
+  const s = {};
+  for (const [m, ps] of Object.entries(ROSTERS)) {
+    s[m] = {};
+    for (const p of ps) {
+      const seedPts = THURSDAY_SEED[m]?.[p.name] ?? 0;
+      s[m][p.name] = { pts: seedPts, lastGame: seedPts, live: false, rounds: seedPts > 0 ? [seedPts] : [] };
+    }
+  }
+  return s;
+}
+
+function loadFromLS() {
+  try {
+    STALE_KEYS.forEach(k => localStorage.removeItem(k));
+    const r = localStorage.getItem(LS_KEY);
+    if (r) return JSON.parse(r);
+    // No v5 cache yet — seed with Thursday's confirmed scores
+    const seed = buildSeedScores();
+    localStorage.setItem(LS_KEY, JSON.stringify(seed));
+    return seed;
+  } catch { return buildSeedScores(); }
+}
+function saveToLS(d) { try { localStorage.setItem(LS_KEY, JSON.stringify(d)); } catch{} }
 
 // ─── ESPN FETCH ───────────────────────────────────────────────────────────────
 const PROXY = "https://sharpshooter-proxy.tzottoli.workers.dev";
@@ -276,17 +310,46 @@ export default function App() {
     const newLiveIds = new Set();
     let newScores;
 
+    // Always load cache first — it holds the running total across all rounds.
+    // ESPN scoreboard only shows recent/active games, so prior-round scores
+    // fall off the API. We merge: take the HIGHER of cached vs ESPN for pts,
+    // so we never lose points from rounds that have scrolled off the scoreboard.
+    const cached = loadFromLS();
+
     if (espnData && !espnData.noGamesYet) {
       newScores = {};
       for (const [manager, players] of Object.entries(ROSTERS)) {
         newScores[manager] = {};
         for (const player of players) {
-          const stat = player.espnId ? espnData.playerStats[player.espnId] : null;
+          const stat   = player.espnId ? espnData.playerStats[player.espnId] : null;
+          const cached_player = cached[manager]?.[player.name];
+
+          // Key rule: never let a refresh zero out points we've already banked.
+          // ESPN pts = cumulative for games currently on the scoreboard.
+          // cached pts = best running total we've seen so far.
+          // Take the max so earlier rounds are never lost.
+          const espnPts   = stat?.pts   ?? 0;
+          const cachedPts = cached_player?.pts ?? 0;
+          const finalPts  = Math.max(espnPts, cachedPts);
+
+          // Rounds: merge arrays, keeping the highest value per slot
+          const espnRounds   = stat?.rounds   ?? [];
+          const cachedRounds = cached_player?.rounds ?? [];
+          const maxLen = Math.max(espnRounds.length, cachedRounds.length);
+          const mergedRounds = Array.from({ length: maxLen }, (_, i) =>
+            Math.max(espnRounds[i] || 0, cachedRounds[i] || 0)
+          );
+
+          // lastGame: use ESPN's value if live/recent, otherwise keep cached
+          const lastGame = stat?.lastGame
+            ? Math.max(stat.lastGame, cached_player?.lastGame ?? 0)
+            : (cached_player?.lastGame ?? 0);
+
           newScores[manager][player.name] = {
-            pts: stat?.pts ?? 0,
-            lastGame: stat?.lastGame ?? 0,
-            live: stat?.live ?? false,
-            rounds: stat?.rounds ?? [],
+            pts:      finalPts,
+            lastGame: lastGame,
+            live:     stat?.live ?? false,
+            rounds:   mergedRounds,
           };
           if (stat?.live && player.espnId) newLiveIds.add(player.espnId);
         }
@@ -295,10 +358,23 @@ export default function App() {
       setDataSource("espn");
       setEliminatedTeamIds(espnData.eliminatedTeamIds || new Set());
     } else if (espnData?.noGamesYet) {
-      newScores = buildZeroScores();
-      setDataSource("none");
+      // No games started yet — show zeros but don't wipe existing cache
+      if (Object.keys(cached).length > 0) {
+        newScores = {};
+        for (const [manager, players] of Object.entries(ROSTERS)) {
+          newScores[manager] = {};
+          for (const player of players) {
+            const c = cached[manager]?.[player.name];
+            newScores[manager][player.name] = { pts: c?.pts ?? 0, lastGame: c?.lastGame ?? 0, live: false, rounds: c?.rounds ?? [] };
+          }
+        }
+        setDataSource("cache");
+      } else {
+        newScores = buildZeroScores();
+        setDataSource("none");
+      }
     } else {
-      const cached = loadFromLS();
+      // ESPN fetch failed — fall back to cache
       if (Object.keys(cached).length > 0) {
         newScores = {};
         for (const [manager, players] of Object.entries(ROSTERS)) {
@@ -350,8 +426,9 @@ export default function App() {
 
 
   const handleReset = () => {
-    localStorage.removeItem(LS_KEY);
-    setScores(buildZeroScores()); setEliminatedTeamIds(new Set()); setShowReset(false);
+    const seed = buildSeedScores();
+    localStorage.setItem(LS_KEY, JSON.stringify(seed));
+    setScores(seed); setEliminatedTeamIds(new Set()); setShowReset(false);
   };
 
   const formatTime = d => d ? d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" }) : "—";
