@@ -399,7 +399,8 @@ export default function App() {
     setTimeout(() => setConfetti([]), 3500);
   }, []);
 
-  const scoringHasStarted = dataSource === "espn" &&
+  // Live tab unlocks as soon as any player has points — works from cache/seed too
+  const scoringHasStarted = dataSource !== "none" && dataSource !== "pending" &&
     Object.values(scores).some(m => Object.values(m).some(p => p.pts > 0));
 
   const fetchScores = useCallback(async () => {
